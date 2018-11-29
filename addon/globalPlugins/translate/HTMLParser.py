@@ -9,7 +9,7 @@
 
 
 import markupbase
-import re
+import sys, re, os
 
 # Regular expressions used for parsing
 
@@ -463,7 +463,9 @@ class HTMLParser(markupbase.ParserBase):
                 # Cannot use name2codepoint directly, because HTMLParser supports apos,
                 # which is not part of HTML 4
                 if HTMLParser.entitydefs is None:
+                    sys.path.append(os.path.dirname(__file__))
                     import htmlentitydefs
+                    del sys.path[-1]
                     entitydefs = {'apos':u"'"}
                     for k, v in htmlentitydefs.name2codepoint.iteritems():
                         entitydefs[k] = unichr(v)

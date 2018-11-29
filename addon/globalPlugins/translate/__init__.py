@@ -54,7 +54,8 @@ Stores the result into the cache so that the same translation does not asks Goog
         return translated
     try:
         translated = mtranslate.translate(text, _conf.language)
-    except:
+    except Exception as e:
+        logHandler.log.exception("Error translating text: %s" % e)
         return text
     _translationCache[text] = translated
     return translated
@@ -99,7 +100,7 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
     textList=[]
     name=propertyValues.get('name')
     if name:
-	textList.append(translate(name))
+	textList.append(translate(name.replace("&", "")))
     if 'role' in propertyValues:
 	role=propertyValues['role']
 	speakRole=True
