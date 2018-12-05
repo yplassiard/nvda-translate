@@ -39,7 +39,7 @@ Stores the result into the cache so that the same translation does not asks Goog
 """
     global _translationCache, _enableTranslation, _gpObject
 
-    if _enableTranslation is False:
+    if _gpObject is None or _enableTranslation is False:
         return None
     msg = "Cache Dump:\n"
     for key in _translationCache:
@@ -233,7 +233,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def __init__(self):
         """Initializes the global plugin object."""
         super(globalPluginHandler.GlobalPlugin, self).__init__()
-        global _nvdaSpeakText, _nvdaGetSpeechTextForProperties, _nvdaSpeak
+        global _nvdaSpeakText, _nvdaGetSpeechTextForProperties, _nvdaSpeak, _gpObject
         
         # if on a secure Desktop, disable the Add-on
         if globalVars.appArgs.secure: return
