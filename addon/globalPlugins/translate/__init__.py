@@ -18,12 +18,8 @@ import htmlentitydefs
 import HTMLParser
 import mtranslate
 del sys.path[-1]
-import addonHandler
+import addonHandler, languageHandler
 addonHandler.initTranslation()
-
-class ModuleConfig(object):
-    language = 'fr'
-    proxies = None # {'http': '10.116.253.137:80'}
 
 #
 # Global variables
@@ -32,7 +28,7 @@ class ModuleConfig(object):
 _translationCache = {}
 _nvdaSpeak = None
 _nvdaGetSpeechTextForProperties = None
-_conf = ModuleConfig()
+_gpObject = None
 _lastError = 0
 _enableTranslation = False
 
@@ -41,7 +37,7 @@ def translate(text):
     """translates the given text to the desired language.
 Stores the result into the cache so that the same translation does not asks Google servers too often.
 """
-    global _translationCache, _enableTranslation, _conf
+    global _translationCache, _enableTranslation, _gpObject
 
     if _enableTranslation is False:
         return None
@@ -53,7 +49,7 @@ Stores the result into the cache so that the same translation does not asks Goog
     if translated is not None:
         return translated
     try:
-        translated = mtranslate.translate(text, _conf.language)
+        translated = mtranslate.translate(text, _gpObject.language)
     except Exception as e:
         logHandler.log.exception("Error translating text: %s" % e)
         return text
@@ -232,6 +228,7 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     scriptCategory = _("Translate")
+    language = None
 
     def __init__(self):
         """Initializes the global plugin object."""
@@ -240,7 +237,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         
         # if on a secure Desktop, disable the Add-on
         if globalVars.appArgs.secure: return
-
+        _gpObject = self
+        try:
+            self.language = config.conf["general"]["language"]
+        except:
+            pass
+        if self.language is None:
+            try:
+                self.language = languageHandler.getWindowsLanguage()[:2]
+            except:
+                self.language = 'en'
+                
+        logHandler.log.info("Translate module initialized, translating to %s" %(self.language))
         _nvdaSpeak = speech.speak
         _nvdaGetSpeechTextForProperties = speech.getSpeechTextForProperties
         speech.speak = speak
@@ -260,9 +268,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         
         _enableTranslation = not _enableTranslation
         if _enableTranslation:
-            ui.message(_("Translation enabled"))
+            ui.message(_("Translation enabled."))
         else:
-            ui.message(_("Translation disabled"))
+            ui.message(_("Translation disabled."))
 
     script_toggleTranslate.__doc__ = _("Enables translation to the desired language.")
             
