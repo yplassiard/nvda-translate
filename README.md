@@ -21,5 +21,5 @@ Please, be aware that when the feature is active, any spoken text is sent to the
 ## Contact and bug reports
 - If you encounter any issue while using this add-on, please create a GitHub issue so that it will be easily trackable.
 - Of course, Pull Requests are also welcomed if you want to extend the add-on or fix any issue.
-- To contact me, you can use the address: [contact author](podcastcecitek@gmail.com)
+- To contact me, you can use the address: [contact author](mailto:podcastcecitek@gmail.com)
 
