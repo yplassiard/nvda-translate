@@ -114,7 +114,7 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
     includeTableCellCoords=propertyValues.get('includeTableCellCoords',True)
     if role==controlTypes.ROLE_CHARTELEMENT:
         speakRole=False
-        roleText=propertyValues.get('roleText')
+    roleText=propertyValues.get('roleText')
     if speakRole and (roleText or reason not in (controlTypes.REASON_SAYALL,controlTypes.REASON_CARET,controlTypes.REASON_FOCUS) or not (name or value or cellCoordsText or rowNumber or columnNumber) or role not in controlTypes.silentRolesOnFocus) and (role!=controlTypes.ROLE_MATH or reason not in (controlTypes.REASON_CARET,controlTypes.REASON_SAYALL)):
         textList.append(translate(roleText) if roleText else controlTypes.roleLabels[role])
     if value:
@@ -242,8 +242,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         try:
             self.language = config.conf["general"]["language"]
         except:
+            self.language = None
             pass
-        if self.language is None:
+        if self.language is None or self.language == 'Windows':
             try:
                 self.language = languageHandler.getWindowsLanguage()[:2]
             except:
