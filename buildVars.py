@@ -14,13 +14,13 @@ addon_info = {
 	"addon_name" : "translate",
 	# Add-on summary, usually the user visible name of the addon.
 	# Translators: Summary for this add-on to be shown on installation and add-on information.
-	"addon_summary" : _("Translates spoken text to the desired language"),
+	"addon_summary" : _("Translate"),
 	# Add-on description
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
 	"addon_description" : _("""Uses the Google Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection."""),
 	# version
-	"addon_version" : "2018.12",
+	"addon_version" : "2018.12.1",
 	# Author(s)
 	"addon_author" : u"Yannick PLASSIARD <podcastcecitek@gmail.com>",
 	# URL for the add-on documentation support

@@ -4,6 +4,12 @@
 #Copyright (C) 2018 Yannick PLASSIARD
 #This file is covered by the GNU General Public License.
 #See the file LICENSE for more details.
+#This add-on also uses the following external libraries:
+#markupbase, htmlentitydefs, HTMLParser: Come from the Python2 standard installation.
+#mtranslate: MIT License
+
+# Moreover, the mtranslate package relies on URLLib, part of Python2 standard installation to
+# connect to the Google Translate server.
 
 
 
