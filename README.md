@@ -18,6 +18,10 @@ When active, the add-on will intercept any spoken text and connect to the Google
 
 Please, be aware that when the feature is active, any spoken text is sent to the Google Translate service. It means that any spoken information will be sent, whatever this could be (a simple sentence, file names within your Windows Explorer, mail content, contacts, phone numbers, or even credit card numbers). It is therefore important to activate this feature only when you're certain of which text your NVDA will speak. This module has been primarily developed to be used within games, so no privacy concerns are present. You're free to used it with whatever you want, but at your own risks.
 
+## About Performances
+You may notice that when the feature is active, there is a delay between each spoken text. This is due to the translate API: because the add-on do not use the non-free Google Translate API SDK, an HTTP connection is made each and every time a text has to be translated. Therefore, a 8mbps Internet connection is recommended for this feature to work correctly.
+Of course, the more bandwidth you have, the faster the translation will happen.
+
 ## Contact and bug reports
 - If you encounter any issue while using this add-on, please create a GitHub issue so that it will be easily trackable.
 - Of course, Pull Requests are also welcomed if you want to extend the add-on or fix any issue.
