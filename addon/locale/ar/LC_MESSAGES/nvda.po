@@ -1,0 +1,109 @@
+# NVDA Translate Addon - French
+# Copyright (C) 2018 Yannick Plassiard
+# This file is distributed under the same license as the translate package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: translate 2018.11\n"
+"Report-Msgid-Bugs-To: nvda-translations@freelists.org\n"
+"POT-Creation-Date: 2018-12-05 11:30+0100\n"
+"PO-Revision-Date: 2018-12-19 12:18+0200\n"
+"Last-Translator: wafiqtaher <wafiqtaher@gmail.com>\n"
+"Language-Team: wafiqtaher <wafiqtaher@gmail.com>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.11\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#. Translators: Speaks current row number (example output: row 3).
+#: addon/globalPlugins/translate/__init__.py:147
+#, python-format
+msgid "row %s"
+msgstr "الصف %s"
+
+#. Translators: Speaks the row span added to the current row number (example output: through 5).
+#. Translators: Speaks the column span added to the current column number (example output: through 5).
+#: addon/globalPlugins/translate/__init__.py:150
+#: addon/globalPlugins/translate/__init__.py:162
+#, python-format
+msgid "through %s"
+msgstr "من خلال %s"
+
+#. Translators: Speaks current column number (example output: column 3).
+#: addon/globalPlugins/translate/__init__.py:159
+#, python-format
+msgid "column %s"
+msgstr "العمود %s"
+
+#. Translators: Speaks the row and column span added to the current row and column numbers
+#. (example output: through row 5 column 3).
+#: addon/globalPlugins/translate/__init__.py:168
+#, python-brace-format
+msgid "through row {row} column {column}"
+msgstr "من خلال الصف {row} عمود {column}"
+
+#. Translators: Speaks number of columns and rows in a table (example output: with 3 rows and 2 columns).
+#: addon/globalPlugins/translate/__init__.py:176
+#, python-brace-format
+msgid "with {rowCount} rows and {columnCount} columns"
+msgstr "{rowCount} الصفوف و {columnCount} الأعمدة"
+
+#. Translators: Speaks number of columns (example output: with 4 columns).
+#: addon/globalPlugins/translate/__init__.py:179
+#, python-format
+msgid "with %s columns"
+msgstr "مع %s الأعمدة"
+
+#. Translators: Speaks number of rows (example output: with 2 rows).
+#: addon/globalPlugins/translate/__init__.py:182
+#, python-format
+msgid "with %s rows"
+msgstr "مع %s الصفوف"
+
+#. Translators: Spoken to indicate the position of an item in a group of items (such as a list).
+#. {number} is replaced with the number of the item in the group.
+#. {total} is replaced with the total number of items in the group.
+#: addon/globalPlugins/translate/__init__.py:202
+#, python-brace-format
+msgid "{number} of {total}"
+msgstr "{number} من {total}"
+
+#. Translators: Speaks the item level in treeviews (example output: level 2).
+#: addon/globalPlugins/translate/__init__.py:208
+#: addon/globalPlugins/translate/__init__.py:212
+#, python-format
+msgid "level %s"
+msgstr "مستوى %s"
+
+#: addon/globalPlugins/translate/__init__.py:230
+msgid "Translate"
+msgstr "ترجمة"
+
+#: addon/globalPlugins/translate/__init__.py:271
+msgid "Translation enabled."
+msgstr "تمكين الترجمة."
+
+#: addon/globalPlugins/translate/__init__.py:273
+msgid "Translation disabled."
+msgstr "تعطيل الترجمة."
+
+#: addon/globalPlugins/translate/__init__.py:275
+msgid "Enables translation to the desired language."
+msgstr "تُمكن الترجمة الى اللغة المطلوبة."
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+#: buildVars.py:20
+msgid ""
+"Uses the Google Translate API to translate each spoken text to the desired "
+"language, on the fly.\n"
+"This add-on requires an internet connection."
+msgstr ""
+"يستخدم واجهة برمجة تطبيقات الترجمة من Google لترجمة كل نص منطوق إلى اللغة "
+"المطلوبة ، على الفور.\n"
+"هذه الإضافة تتطلب الإنتر نت."
