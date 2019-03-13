@@ -13,11 +13,12 @@
 
 
 
-import os, sys, time
+import os, sys, time, io
 import globalVars
 import globalPluginHandler, logHandler
 import api, controlTypes
 import ui, wx, gui, core, config, speech
+import json
 sys.path.append(os.path.dirname(__file__))
 import markupbase
 import htmlentitydefs
@@ -261,7 +262,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         _nvdaGetSpeechTextForProperties = speech.getSpeechTextForProperties
         speech.speak = speak
         speech.getSpeechTextForProperties = getSpeechTextForProperties
-
+        self.loadLocalCache()
         
 
     def terminate(self):
@@ -269,6 +270,36 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         global _nvdaSpeakText, _nvdaGetSpeechTextForProperties, _nvdaSpeak
         speech.speak = _nvdaSpeak
         speech.getSpeechTextForProperties = _nvdaGetSpeechTextForProperties
+        self.saveLocalCache()
+
+    def loadLocalCache(self):
+        global _translationCache
+
+        path = os.path.join(config.getInstalledUserConfigPath(), "translation-cache.json")
+        try:
+            cacheFile = io.FileIO(path, "r")
+        except:
+            return
+        try:
+            values = json.load(cacheFile)
+            cacheFile.close()
+        except Exception as e:
+            logHandler.log.error("Cannot read or decode data from {path}: {e}".format(path=path, e=e))
+            return
+        _translationCache = values
+    def saveLocalCache(self):
+        global _translationCache
+
+        path = os.path.join(config.getInstalledUserConfigPath(), "translation-cache.json")
+        try:
+            cacheFile = io.FileIO(path, "w")
+            json.dump(_translationCache, cacheFile)
+            cacheFile.close()
+        except Exception as e:
+            logHandler.log.error("Failed to save translation cache to {file}: {error}".format(file=path, error=e))
+            return
+        
+            
 
 
     def script_toggleTranslate(self, gesture):
