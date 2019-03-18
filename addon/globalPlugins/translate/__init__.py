@@ -13,7 +13,7 @@
 
 
 
-import os, sys, time, io
+import os, sys, time, io, re
 import globalVars
 import globalPluginHandler, logHandler
 import api, globalVars, controlTypes
@@ -46,22 +46,29 @@ Stores the result into the cache so that the same translation does not asks Goog
 """
 	global _translationCache, _enableTranslation, _gpObject
 
+		try:
+				appName = globalVars.focusObject.appModule.appName
+		except:
+				appName = "__global__"
+		
 	if _gpObject is None or _enableTranslation is False:
-		return None
-	msg = "Cache Dump:\n"
-	for key in _translationCache:
-		msg += "	%s => %s\n" %(key, _translationCache[key])
-	logHandler.log.debugWarning(msg)
-	translated = _translationCache.get(text, None)
+		return text
+		appTable = _translationCache.get(appName, None)
+		if appTable is None:
+				_translationCache[appName] = {}
+		translated = _translationCache[appName].get(text, None)
 	if translated is not None:
 		return translated
 	try:
 		prepared = text.encode('utf8', ':/')
 		translated = mtranslate.translate(prepared, _gpObject.language)
 	except Exception as e:
-		_translationCache[text] = text
+		_translationCache[appName][text] = text
 		return text
-	_translationCache[text] = translated
+		if translated is None or len(translated) == 0:
+				translated = text
+		
+	_translationCache[appName][text] = translated
 	return translated
 
 
@@ -275,29 +282,47 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def loadLocalCache(self):
 		global _translationCache
 
-		path = os.path.join(globalVars.appArgs.configPath, "translation-cache.json")
-		try:
-			cacheFile = io.FileIO(path, "r")
-		except:
-			return
-		try:
-			values = json.load(cacheFile)
-			cacheFile.close()
-		except Exception as e:
-			logHandler.log.error("Cannot read or decode data from {path}: {e}".format(path=path, e=e))
-			return
-		_translationCache = values
+		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
+				# Checks that the storage path exists or create it.
+				if os.path.exists(path) is False:
+						try:
+								os.mkdir(path)
+						except Exception as e:
+								logHandler.log.error("Failed to create storage path: {path} ({error})".format(path=path, error=e))
+								return
+
+				# Scan stored files and load them.
+				
+				for entry in os.listdir(path):
+						m = re.match("(.*)\.json$", entry)
+						if m is not None:
+								appName = m.group(1)
+								
+								try:
+							cacheFile = io.FileIO(os.path.join(path, entry))
+						except:
+							return
+						try:
+							values = json.load(cacheFile)
+							cacheFile.close()
+						except Exception as e:
+							logHandler.log.error("Cannot read or decode data from {path}: {e}".format(path=path, e=e))
+							continue
+						_translationCache[appName] = values
 	def saveLocalCache(self):
 		global _translationCache
 
-		path = os.path.join(globalVars.appArgs.configPath, "translation-cache.json")
-		try:
-			cacheFile = io.FileIO(path, "w")
-			json.dump(_translationCache, cacheFile)
-			cacheFile.close()
-		except Exception as e:
-			logHandler.log.error("Failed to save translation cache to {file}: {error}".format(file=path, error=e))
-			return
+		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
+				for appName in _translationCache:
+						file = os.path.join(path, "%s.json" %(appName))
+						try:
+					cacheFile = io.FileIO(file, "w")
+					json.dump(_translationCache[appName], cacheFile)
+					cacheFile.close()
+				except Exception as e:
+					logHandler.log.error("Failed to save translation cache for {app} to {file}: {error}".format(apap=appName, file=file, error=e))
+					continue
+				
 		
 			
 
