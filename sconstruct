@@ -1,24 +1,29 @@
-# NVDA add-on template  SCONSTRUCT file
+# NVDA add-on template	SCONSTRUCT file
 #Copyright (C) 2012, 2014 Rui Batista <ruiandrebatista@gmail.com>
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
 import codecs
 import gettext
-import os
+import os, sys
 import os.path
 import zipfile
 
 import buildVars
 
+
 def md2html(source, dest):
 	import markdown
+
 	lang = os.path.basename(os.path.dirname(source)).replace('_', '-')
 	title="{addonSummary} {addonVersion}".format(addonSummary=buildVars.addon_info["addon_summary"], addonVersion=buildVars.addon_info["addon_version"])
 	headerDic = {
 		"[[!meta title=\"": "# ",
 		"\"]]": " #",
 	}
+	# python3 fixes
+	if sys.version_info.major == 3:
+		headerDic.iteritems = headerDic.items
 	with codecs.open(source, "r", "utf-8") as f:
 		mdText = f.read()
 		for k, v in headerDic.iteritems():
@@ -27,7 +32,7 @@ def md2html(source, dest):
 	with codecs.open(dest, "w", "utf-8") as f:
 		f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n" +
-			"    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
+			"		 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
 			"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"%s\" lang=\"%s\">\n" % (lang, lang) +
 			"<head>\n" +
 			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n" +
@@ -127,7 +132,11 @@ def generateManifest(source, dest):
 		f.write(manifest)
 
 def generateTranslatedManifest(source, language, out):
-	_ = gettext.translation("nvda", localedir=os.path.join("addon", "locale"), languages=[language]).ugettext
+	trans = gettext.translation("nvda", localedir=os.path.join("addon", "locale"), languages=[language])
+	if sys.version_info.major == 3:
+		_ = trans.gettext
+	else:
+		_ = trans.ugettext
 	vars = {}
 	for var in ("addon_summary", "addon_description"):
 		vars[var] = _(buildVars.addon_info[var])

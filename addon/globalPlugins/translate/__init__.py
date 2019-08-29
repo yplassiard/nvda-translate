@@ -13,16 +13,20 @@
 
 
 
-import os, sys, time, io, re
+import os, sys, time, codecs, re
 import globalVars
 import globalPluginHandler, logHandler
-import api, globalVars, controlTypes
+import api, controlTypes
 import ui, wx, gui, core, config, speech
 import json
-sys.path.append(os.path.dirname(__file__))
+curDir = os.path.abspath(os.path.dirname(__file__))
+
+sys.path.insert(0, curDir)
+sys.path.insert(0, os.path.join(curDir, "html"))
 import markupbase
-import htmlentitydefs
-import HTMLParser
+if sys.version_info.major == 2:
+	import htmlentitydefs
+	import HTMLParser
 import mtranslate
 del sys.path[-1]
 import addonHandler, languageHandler
@@ -46,17 +50,17 @@ Stores the result into the cache so that the same translation does not asks Goog
 """
 	global _translationCache, _enableTranslation, _gpObject
 
-		try:
-				appName = globalVars.focusObject.appModule.appName
-		except:
-				appName = "__global__"
+	try:
+		appName = globalVars.focusObject.appModule.appName
+	except:
+		appName = "__global__"
 		
 	if _gpObject is None or _enableTranslation is False:
 		return text
-		appTable = _translationCache.get(appName, None)
-		if appTable is None:
-				_translationCache[appName] = {}
-		translated = _translationCache[appName].get(text, None)
+	appTable = _translationCache.get(appName, None)
+	if appTable is None:
+		_translationCache[appName] = {}
+	translated = _translationCache[appName].get(text, None)
 	if translated is not None:
 		return translated
 	try:
@@ -65,8 +69,8 @@ Stores the result into the cache so that the same translation does not asks Goog
 	except Exception as e:
 		_translationCache[appName][text] = text
 		return text
-		if translated is None or len(translated) == 0:
-				translated = text
+	if translated is None or len(translated) == 0:
+					translated = text
 		
 	_translationCache[appName][text] = translated
 	return translated
@@ -76,19 +80,19 @@ Stores the result into the cache so that the same translation does not asks Goog
 ## Extracted and adapted from nvda/sources/speech.py
 #
 
-def speak(speechSequence,symbolLevel=None):
+def speak(speechSequence, **args):
 	global _enableTranslation
 
 	if _enableTranslation is False:
-		return _nvdaSpeak(speechSequence, symbolLevel)
+		return _nvdaSpeak(speechSequence, **args)
 	newSpeechSequence = []
 	for val in speechSequence:
-		if isinstance(val, basestring):
+		if (sys.version_info.major == 2 and isinstance(val, basestring)) or (sys.version_info.major == 3 and isinstance(val, str)):
 			v = translate(val)
 			newSpeechSequence.append(v if v is not None else val)
 		else:
 			newSpeechSequence.append(val)
-	_nvdaSpeak(newSpeechSequence, symbolLevel)
+	_nvdaSpeak(newSpeechSequence, **args)
 
 #
 ## This is overloaded as well because the generated text may contain already translated text by
@@ -179,7 +183,7 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
 					oldColumnSpan = columnSpan
 			if includeTableCellCoords and not cellCoordsText and rowSpan>1 and columnSpan>1:
 				# Translators: Speaks the row and column span added to the current row and column numbers
-				#					   (example output: through row 5 column 3).
+				#						 (example output: through row 5 column 3).
 				textList.append(_("through row {row} column {column}").format(
 					row=rowNumber+rowSpan-1,
 					column=columnNumber+columnSpan-1
@@ -283,49 +287,46 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		global _translationCache
 
 		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
-				# Checks that the storage path exists or create it.
-				if os.path.exists(path) is False:
-						try:
-								os.mkdir(path)
-						except Exception as e:
-								logHandler.log.error("Failed to create storage path: {path} ({error})".format(path=path, error=e))
-								return
-
-				# Scan stored files and load them.
-				
-				for entry in os.listdir(path):
-						m = re.match("(.*)\.json$", entry)
-						if m is not None:
-								appName = m.group(1)
-								
-								try:
-							cacheFile = io.FileIO(os.path.join(path, entry))
-						except:
-							return
-						try:
-							values = json.load(cacheFile)
-							cacheFile.close()
-						except Exception as e:
-							logHandler.log.error("Cannot read or decode data from {path}: {e}".format(path=path, e=e))
-							continue
-						_translationCache[appName] = values
+		# Checks that the storage path exists or create it.
+		if os.path.exists(path) is False:
+			try:
+				os.mkdir(path)
+			except Exception as e:
+				logHandler.log.error("Failed to create storage path: {path} ({error})".format(path=path, error=e))
+				return
+												
+			# Scan stored files and load them.
+		
+		for entry in os.listdir(path):
+			m = re.match("(.*)\.json$", entry)
+			if m is not None:
+				appName = m.group(1)
+				try:
+					cacheFile = codecs.open(os.path.join(path, entry), "r", "utf-8")
+				except:
+					continue
+				try:
+					values = json.load(cacheFile)
+					cacheFile.close()
+				except Exception as e:
+					logHandler.log.error("Cannot read or decode data from {path}: {e}".format(path=path, e=e))
+					cacheFile.close()
+					continue
+				_translationCache[appName] = values
+				cacheFile.close()
 	def saveLocalCache(self):
 		global _translationCache
 
 		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
-				for appName in _translationCache:
-						file = os.path.join(path, "%s.json" %(appName))
-						try:
-					cacheFile = io.FileIO(file, "w")
-					json.dump(_translationCache[appName], cacheFile)
-					cacheFile.close()
-				except Exception as e:
-					logHandler.log.error("Failed to save translation cache for {app} to {file}: {error}".format(apap=appName, file=file, error=e))
-					continue
-				
-		
-			
-
+		for appName in _translationCache:
+			file = os.path.join(path, "%s.json" %(appName))
+			try:
+				cacheFile = codecs.open(file, "w", "utf-8")
+				json.dump(_translationCache[appName], cacheFile)
+				cacheFile.close()
+			except Exception as e:
+				logHandler.log.error("Failed to save translation cache for {app} to {file}: {error}".format(apap=appName, file=file, error=e))
+				continue
 
 	def script_toggleTranslate(self, gesture):
 		global _enableTranslation
@@ -337,8 +338,39 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			ui.message(_("Translation disabled."))
 
 	script_toggleTranslate.__doc__ = _("Enables translation to the desired language.")
+
+	def script_flushAllCache(self, gesture):
+		if gui.messageBox(_("Are you sure you want to delete all cached translations?"), _("Delete all translations"), style=wx.YES | wx.NO | wx.CENTER, parent=gui.mainFrame) == wx.YES:
+			global _translationCache
+			_translationCache = {}
+			path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
+			for entry in os.listdir(path):
+				try:
+					os.unlink(os.path.join(path, entry))
+				except Exception as e:
+					logHandler.log.error("Failed to remove {entry}".format(entry=entry))
+	script_flushAllCache.__doc__ = _("Remove all cached translations for all applications.")
+
+	def script_flushCurrentAppCache(self, gesture):
+		try:
+			appName = globalVars.focusObject.appModule.appName
+		except:
+			ui.message(_("No focused application"))
+			return
+		if gui.messageBox(_("Are you sure you want to remove translations for {appName}".format(appName=appName)), _("Remove translations for {appName}".format(appName=appName)), style=wx.YES | wx.NO | wx.CENTER, parent=gui.mainFrame) == wx.YES:
+			global _translationCache
 			
+			_translationCache[appName] = {}
+			try:
+				os.unlink(os.path.join(globalVars.appArgs.configPath, "{app}.json".format(app=appName)))
+			except Exception as e:
+				logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
+	script_flushCurrentAppCache.__coc__ = _("Remove translation cache for the currently focused application")
+																
+																 
 
 	__gestures = {
 		"kb:nvda+shift+control+t": "toggleTranslate",
+		"kb:nvda+shift+control+f": "flushAllCache",
+		"kb:nvda+shift+f": "flushCurrentAppCache",
 	}

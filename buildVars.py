@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Build customizations
 # Change this file instead of sconstruct or manifest files, whenever possible.
@@ -20,7 +20,7 @@ addon_info = {
 	"addon_description" : _("""Uses the Google Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection."""),
 	# version
-	"addon_version" : "2019.03.3",
+	"addon_version" : "2019.09.1",
 	# Author(s)
 	"addon_author" : u"Yannick PLASSIARD <podcastcecitek@gmail.com>",
 	# URL for the add-on documentation support
@@ -30,7 +30,7 @@ This add-on requires an internet connection."""),
 	# Minimum NVDA version supported (e.g. "2018.3")
 	"addon_minimumNVDAVersion" : "2018.3",
 	# Last NVDA version supported/tested (e.g. "2018.4", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion" : "2018.4",
+	"addon_lastTestedNVDAVersion" : "2019.2",
 	# Add-on update channel (default is stable or None)
 	"addon_updateChannel" : "dev", 
 }
@@ -40,7 +40,7 @@ import os.path
 
 # Define the python files that are the sources of your add-on.
 # You can use glob expressions here, they will be expanded.
-pythonSources = ['addon/globalPlugins/translate/*.py']
+pythonSources = ['addon/globalPlugins/translate/*.py', 'addon/globalPlugins/translate/*/*.py']
 
 # Files that contain strings for translation. Usually your python sources
 i18nSources = pythonSources + ["buildVars.py"]
