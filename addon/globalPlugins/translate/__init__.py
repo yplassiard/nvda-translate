@@ -31,7 +31,6 @@ import mtranslate
 del sys.path[-1]
 import addonHandler, languageHandler
 addonHandler.initTranslation()
-
 #
 # Global variables
 #
