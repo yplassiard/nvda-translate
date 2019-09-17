@@ -22,12 +22,15 @@ def md2html(source, dest):
 		"\"]]": " #",
 	}
 	# python3 fixes
-	if sys.version_info.major == 3:
-		headerDic.iteritems = headerDic.items
 	with codecs.open(source, "r", "utf-8") as f:
 		mdText = f.read()
-		for k, v in headerDic.iteritems():
-			mdText = mdText.replace(k, v, 1)
+		if sys.version_info.major == 2:
+			for k, v in headerDic.iteritems():
+				mdText = mdText.replace(k, v, 1)
+		else:
+			for k, v in headerDic.items():
+				mdText = mdText.replace(k, v, 1)
+			
 		htmlText = markdown.markdown(mdText)
 	with codecs.open(dest, "w", "utf-8") as f:
 		f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

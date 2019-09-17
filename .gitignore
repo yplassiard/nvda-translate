@@ -1,5 +1,5 @@
 addon/doc/*.css
-addon/doc/en/
+addon/doc/*/*.html
 *_docHandler.py
 *.html
 *.ini

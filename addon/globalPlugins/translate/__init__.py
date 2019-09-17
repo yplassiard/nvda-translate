@@ -15,7 +15,7 @@
 
 import os, sys, time, codecs, re
 import globalVars
-import globalPluginHandler, logHandler
+import globalPluginHandler, logHandler, scriptHandler
 import api, controlTypes
 import ui, wx, gui, core, config, speech
 import json
@@ -339,15 +339,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	script_toggleTranslate.__doc__ = _("Enables translation to the desired language.")
 
 	def script_flushAllCache(self, gesture):
-		if gui.messageBox(_("Are you sure you want to delete all cached translations?"), _("Delete all translations"), style=wx.YES | wx.NO | wx.CENTER, parent=gui.mainFrame) == wx.YES:
-			global _translationCache
-			_translationCache = {}
-			path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
-			for entry in os.listdir(path):
-				try:
-					os.unlink(os.path.join(path, entry))
-				except Exception as e:
-					logHandler.log.error("Failed to remove {entry}".format(entry=entry))
+		if scriptHandler.getLastScriptRepeatCount() == 0:
+			ui.message(_("Press twice to delete all cached translations for all applications."))
+			return
+		global _translationCache
+		_translationCache = {}
+		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
+		for entry in os.listdir(path):
+			try:
+				os.unlink(os.path.join(path, entry))
+			except Exception as e:
+				logHandler.log.error("Failed to remove {entry}".format(entry=entry))
+		ui.message(_("All translations have been deleted."))
 	script_flushAllCache.__doc__ = _("Remove all cached translations for all applications.")
 
 	def script_flushCurrentAppCache(self, gesture):
@@ -356,15 +359,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		except:
 			ui.message(_("No focused application"))
 			return
-		if gui.messageBox(_("Are you sure you want to remove translations for {appName}".format(appName=appName)), _("Remove translations for {appName}".format(appName=appName)), style=wx.YES | wx.NO | wx.CENTER, parent=gui.mainFrame) == wx.YES:
-			global _translationCache
+		if scriptHandler.getLastScriptRepeatCount() == 0:
+			ui.message(_("Press twice to delete all translations for {app}".format(app=appName)))
+			return
+		
+		global _translationCache
 			
-			_translationCache[appName] = {}
-			try:
-				os.unlink(os.path.join(globalVars.appArgs.configPath, "{app}.json".format(app=appName)))
-			except Exception as e:
-				logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
-	script_flushCurrentAppCache.__coc__ = _("Remove translation cache for the currently focused application")
+		_translationCache[appName] = {}
+		try:
+			os.unlink(os.path.join(globalVars.appArgs.configPath, "translation-cache", "{app}.json".format(app=appName)))
+		except Exception as e:
+			logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
+		ui.message(_("Transpation cache for {app} has been deleted.".format(app=appName)))
+	script_flushCurrentAppCache.__doc__ = _("Remove translation cache for the currently focused application")
 																
 																 
 

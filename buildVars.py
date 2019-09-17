@@ -20,7 +20,7 @@ addon_info = {
 	"addon_description" : _("""Uses the Google Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection."""),
 	# version
-	"addon_version" : "2019.09.1",
+	"addon_version" : "2019.09.2",
 	# Author(s)
 	"addon_author" : u"Yannick PLASSIARD <podcastcecitek@gmail.com>",
 	# URL for the add-on documentation support
