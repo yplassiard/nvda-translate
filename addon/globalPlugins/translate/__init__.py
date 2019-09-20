@@ -345,12 +345,17 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		global _translationCache
 		_translationCache = {}
 		path = os.path.join(globalVars.appArgs.configPath, "translation-cache")
+		error = False
 		for entry in os.listdir(path):
 			try:
 				os.unlink(os.path.join(path, entry))
 			except Exception as e:
 				logHandler.log.error("Failed to remove {entry}".format(entry=entry))
-		ui.message(_("All translations have been deleted."))
+				error = True
+		if not error:
+			ui.message(_("All translations have been deleted."))
+		else:
+			ui.message(_("Some caches failed to be removed."))
 	script_flushAllCache.__doc__ = _("Remove all cached translations for all applications.")
 
 	def script_flushCurrentAppCache(self, gesture):
@@ -366,11 +371,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		global _translationCache
 			
 		_translationCache[appName] = {}
-		try:
-			os.unlink(os.path.join(globalVars.appArgs.configPath, "translation-cache", "{app}.json".format(app=appName)))
-		except Exception as e:
-			logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
-		ui.message(_("Transpation cache for {app} has been deleted.".format(app=appName)))
+		fullPath = os.path.join(globalVars.appArgs.configPath, "translation-cache", "{app}.json".format(app=appName))
+		if os.path.exists(fullPath):
+			try:
+				os.unlink(fullPath)
+			except Exception as e:
+				logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
+				ui.message(_("Error while deleting application's translation cache."))
+				return
+			ui.message(_("Translation cache for {app} has been deleted.".format(app=appName)))
+		else:
+			ui.message(_("No saved translations for {app}".format(app=appName)))
+			
 	script_flushCurrentAppCache.__doc__ = _("Remove translation cache for the currently focused application")
 																
 																 

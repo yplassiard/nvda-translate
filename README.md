@@ -1,7 +1,7 @@
 # nvda-translate
 Make NVDA translate any spoken text to the desired language.
 ## Download
-- Stable release can be found [here](https://www.mtyp.fr/nvda/translate-2019.09.2.nvda-addon).
+- Stable: [translate-2019.09.3]](https://www.mtyp.fr/nvda/translate-2019.09.3.nvda-addon).
 
 ## Installation
 
@@ -17,7 +17,7 @@ Then, to enable or disable the translation, press NVDA+Shift+Control+T. This ges
 The following gestures are defined (and can be changed within the Gesture commands dialog):
 - NVDA+Shift+Control+T: Activates / deactivates the translation.
 - NVDA+Shift+F (twice quickly): Clears the cache for the current application.
-- NVDA+Shipt+Control+F (twice quickly): Clear all caches for all translations for all applications.
+- NVDA+Shift+Control+F (twice quickly): Clear all caches for all translations for all applications.
 
 ## About Cache
 To increase performances (see below), each translated text is stored within a cache file. A cache file is created for each application the translation has been activated in, and is located in the "translation-cache" directory within your NVDA's user configuration directory.
