@@ -5,101 +5,130 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: translate 2018.11\n"
+"Project-Id-Version: translate 2019.09.3\n"
 "Report-Msgid-Bugs-To: nvda-translations@freelists.org\n"
-"POT-Creation-Date: 2018-12-05 11:30+0100\n"
-"PO-Revision-Date: 2018-12-19 14:21+0300\n"
+"POT-Creation-Date: 2019-09-20 12:50+0300\n"
+"PO-Revision-Date: 2019-09-20 12:55+0300\n"
 "Last-Translator: Yannick Plassiard <podcastcecitek@gmail.com>\n"
 "Language-Team: cagrid@hotmail.com\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: ../../../globalPlugins/translate\n"
+"X-Poedit-SearchPath-0: .\n"
 
-#. Translators: Speaks current row number (example output: row 3).
-#: addon/globalPlugins/translate/__init__.py:147
+#: __init__.py:165
 #, python-format
 msgid "row %s"
 msgstr "satır %s"
 
-#. Translators: Speaks the row span added to the current row number (example output: through 5).
-#. Translators: Speaks the column span added to the current column number (example output: through 5).
-#: addon/globalPlugins/translate/__init__.py:150 addon/globalPlugins/translate/__init__.py:162
+#: __init__.py:168 __init__.py:180
 #, python-format
 msgid "through %s"
 msgstr "%s boyunca"
 
-#. Translators: Speaks current column number (example output: column 3).
-#: addon/globalPlugins/translate/__init__.py:159
+#: __init__.py:177
 #, python-format
 msgid "column %s"
 msgstr "sütun %s"
 
-#. Translators: Speaks the row and column span added to the current row and column numbers
-#. (example output: through row 5 column 3).
-#: addon/globalPlugins/translate/__init__.py:168
+#: __init__.py:186
 #, python-brace-format
 msgid "through row {row} column {column}"
 msgstr "satır {row} sütun {column} boyunca"
 
-#. Translators: Speaks number of columns and rows in a table (example output: with 3 rows and 2 columns).
-#: addon/globalPlugins/translate/__init__.py:176
+#: __init__.py:194
 #, python-brace-format
 msgid "with {rowCount} rows and {columnCount} columns"
 msgstr "{rowCount} satır ve {columnCount} sütunlu"
 
-#. Translators: Speaks number of columns (example output: with 4 columns).
-#: addon/globalPlugins/translate/__init__.py:179
+#: __init__.py:197
 #, python-format
 msgid "with %s columns"
 msgstr "%s sütunlu"
 
-#. Translators: Speaks number of rows (example output: with 2 rows).
-#: addon/globalPlugins/translate/__init__.py:182
+#: __init__.py:200
 #, python-format
 msgid "with %s rows"
 msgstr "%s satırlı"
 
-#. Translators: Spoken to indicate the position of an item in a group of items (such as a list).
-#. {number} is replaced with the number of the item in the group.
-#. {total} is replaced with the total number of items in the group.
-#: addon/globalPlugins/translate/__init__.py:202
+#: __init__.py:220
 #, python-brace-format
 msgid "{number} of {total}"
 msgstr "{number} bölü {total}"
 
-#. Translators: Speaks the item level in treeviews (example output: level 2).
-#: addon/globalPlugins/translate/__init__.py:208 addon/globalPlugins/translate/__init__.py:212
+#: __init__.py:226 __init__.py:230
 #, python-format
 msgid "level %s"
 msgstr "seviye %s"
 
-#: addon/globalPlugins/translate/__init__.py:230
+#: __init__.py:248
 msgid "Translate"
 msgstr "Tercüme"
 
-#: addon/globalPlugins/translate/__init__.py:271
+#: __init__.py:335
 msgid "Translation enabled."
 msgstr "Çeviri etkin"
 
-#: addon/globalPlugins/translate/__init__.py:273
+#: __init__.py:337
 msgid "Translation disabled."
 msgstr "Çeviri devre dışı"
 
-#: addon/globalPlugins/translate/__init__.py:275
+#: __init__.py:339
 msgid "Enables translation to the desired language."
 msgstr "İstenen dile tercümeyi etkinleştirir"
 
-#. Add-on description
-#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-#: buildVars.py:20
-msgid ""
-"Uses the Google Translate API to translate each spoken text to the desired language, on the fly.\n"
-"This add-on requires an internet connection."
-msgstr ""
-"NVDA'nın konuşma sentezleyiciye gönderdiği her metni Google çeviri API'sini kullanarak istenen dile "
-"tercüme eder.\n"
-"Bu eklenti ınternet bağlantısı gerektirir."
+#: __init__.py:343
+msgid "Press twice to delete all cached translations for all applications."
+msgstr "Tüm uygulamalar için önbelleğe alınmış tüm çevirileri silmek için iki kez basın."
+
+#: __init__.py:356
+#| msgid "Translation enabled."
+msgid "All translations have been deleted."
+msgstr "Tüm çeviriler silindi."
+
+#: __init__.py:358
+msgid "Some caches failed to be removed."
+msgstr "Önbellekdeki bazı şeyler silinemedi."
+
+#: __init__.py:359
+msgid "Remove all cached translations for all applications."
+msgstr "Tüm uygulamalar için önbelleğe alınmış tüm çevirileri sil."
+
+#: __init__.py:365
+msgid "No focused application"
+msgstr "Odaklanmış uygulama yok"
+
+#: __init__.py:368
+#, python-brace-format
+msgid "Press twice to delete all translations for {app}"
+msgstr "{app} için önbellekteki tüm çevirileri sil"
+
+#: __init__.py:380
+msgid "Error while deleting application's translation cache."
+msgstr "Uygulamanın çeviri önbelleği silinirken hata oluştu."
+
+#: __init__.py:382
+#, python-brace-format
+msgid "Translation cache for {app} has been deleted."
+msgstr "{app} için çeviri önbelleği silindi."
+
+#: __init__.py:384
+#, python-brace-format
+msgid "No saved translations for {app}"
+msgstr "{app} için Kayıtlı çeviri yok"
+
+#: __init__.py:386
+msgid "Remove translation cache for the currently focused application"
+msgstr "Odaklanan uygulama için çeviri önbelleğini sil"
+
+#~ msgid ""
+#~ "Uses the Google Translate API to translate each spoken text to the desired language, on the fly.\n"
+#~ "This add-on requires an internet connection."
+#~ msgstr ""
+#~ "NVDA'nın konuşma sentezleyiciye gönderdiği her metni Google çeviri API'sini kullanarak istenen dile tercüme eder.\n"
+#~ "Bu eklenti ınternet bağlantısı gerektirir."

@@ -16,20 +16,24 @@
 import os, sys, time, codecs, re
 import globalVars
 import globalPluginHandler, logHandler, scriptHandler
-import api, controlTypes
-import ui, wx, gui, core, config, speech
-import json
-curDir = os.path.abspath(os.path.dirname(__file__))
+try:
+	import api, controlTypes
+	import ui, wx, gui
+	import core, config
+	import speech
+	from speech import *
+	import json
+	curDir = os.path.abspath(os.path.dirname(__file__))
 
-sys.path.insert(0, curDir)
-sys.path.insert(0, os.path.join(curDir, "html"))
-import markupbase
-if sys.version_info.major == 2:
-	import htmlentitydefs
-	import HTMLParser
-import mtranslate
-del sys.path[-1]
-import addonHandler, languageHandler
+	sys.path.insert(0, curDir)
+	sys.path.insert(0, os.path.join(curDir, "html"))
+	import markupbase
+	import mtranslate
+	import addonHandler, languageHandler
+except Exception as e:
+	logHanaler.log.exception("Failed to initialize translate addon", e)
+	raise e
+
 addonHandler.initTranslation()
 #
 # Global variables
@@ -37,7 +41,7 @@ addonHandler.initTranslation()
 
 _translationCache = {}
 _nvdaSpeak = None
-_nvdaGetSpeechTextForProperties = None
+_nvdaGetPropertiesSpeech = None
 _gpObject = None
 _lastError = 0
 _enableTranslation = False
@@ -46,7 +50,7 @@ _enableTranslation = False
 def translate(text):
 	"""translates the given text to the desired language.
 Stores the result into the cache so that the same translation does not asks Google servers too often.
-"""
+	"""
 	global _translationCache, _enableTranslation, _gpObject
 
 	try:
@@ -76,22 +80,23 @@ Stores the result into the cache so that the same translation does not asks Goog
 
 
 #
-## Extracted and adapted from nvda/sources/speech.py
+## Extracted and adapted from nvda/sources/speech/__init__.py
 #
 
-def speak(speechSequence, **args):
+def speak(speechSequence: SpeechSequence,
+					priority: Optional[Spri] = None):
 	global _enableTranslation
 
 	if _enableTranslation is False:
-		return _nvdaSpeak(speechSequence, **args)
+		return _nvdaSpeak(speechSequence=speechSequence, priority=priority)
 	newSpeechSequence = []
 	for val in speechSequence:
-		if (sys.version_info.major == 2 and isinstance(val, basestring)) or (sys.version_info.major == 3 and isinstance(val, str)):
+		if isinstance(val, str):
 			v = translate(val)
 			newSpeechSequence.append(v if v is not None else val)
 		else:
 			newSpeechSequence.append(val)
-	_nvdaSpeak(newSpeechSequence, **args)
+	_nvdaSpeak(speechSequence=newSpeechSequence, priority=priority)
 
 #
 ## This is overloaded as well because the generated text may contain already translated text by
@@ -99,22 +104,15 @@ def speak(speechSequence, **args):
 ## already localized, such as object's name, value, or description
 #
 
-def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues):
-	oldTreeLevel = speech.oldTreeLevel
-	oldTableID = speech.oldTableID
-	oldRowNumber = speech.oldRowNumber
-	oldRowSpan = speech.oldRowSpan
-	oldColumnNumber = speech.oldColumnNumber
-	oldColumnSpan = speech.oldColumnSpan
-
-	global _enableTranslation
-
-	if not _enableTranslation:
-		return _nvdaGetSpeechTextForProperties(reason, **propertyValues)
-	textList=[]
-	name=propertyValues.get('name')
+def getPropertiesSpeech(	# noqa: C901
+		reason = controlTypes.REASON_QUERY,
+		**propertyValues
+):
+	global oldTreeLevel, oldTableID, oldRowNumber, oldRowSpan, oldColumnNumber, oldColumnSpan
+	textList: List[str] = []
+	name: Optional[str] = propertyValues.get('name')
 	if name:
-		textList.append(translate(name.replace("&", "")))
+		textList.append(translate(name))
 	if 'role' in propertyValues:
 		role=propertyValues['role']
 		speakRole=True
@@ -124,15 +122,40 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
 	else:
 		speakRole=False
 		role=controlTypes.ROLE_UNKNOWN
-	value = propertyValues.get('value') if role not in controlTypes.silentValuesForRoles else None
-	cellCoordsText=propertyValues.get('cellCoordsText')
-	rowNumber=propertyValues.get('rowNumber')
-	columnNumber=propertyValues.get('columnNumber')
-	includeTableCellCoords=propertyValues.get('includeTableCellCoords',True)
-	if role==controlTypes.ROLE_CHARTELEMENT:
-		speakRole=False
-	roleText=propertyValues.get('roleText')
-	if speakRole and (roleText or reason not in (controlTypes.REASON_SAYALL,controlTypes.REASON_CARET,controlTypes.REASON_FOCUS) or not (name or value or cellCoordsText or rowNumber or columnNumber) or role not in controlTypes.silentRolesOnFocus) and (role!=controlTypes.ROLE_MATH or reason not in (controlTypes.REASON_CARET,controlTypes.REASON_SAYALL)):
+	value: Optional[str] = propertyValues.get('value') if role not in controlTypes.silentValuesForRoles else None
+	cellCoordsText: Optional[str] = propertyValues.get('cellCoordsText')
+	rowNumber = propertyValues.get('rowNumber')
+	columnNumber = propertyValues.get('columnNumber')
+	includeTableCellCoords = propertyValues.get('includeTableCellCoords', True)
+
+	if role == controlTypes.ROLE_CHARTELEMENT:
+		speakRole = False
+	roleText: Optional[str] = propertyValues.get('roleText')
+	if (
+		speakRole
+		and (
+			roleText
+			or reason not in (
+				controlTypes.REASON_SAYALL,
+				controlTypes.REASON_CARET,
+				controlTypes.REASON_FOCUS
+			)
+			or not (
+				name
+				or value
+				or cellCoordsText
+				or rowNumber
+				or columnNumber
+			)
+			or role not in controlTypes.silentRolesOnFocus
+		)
+		and (
+			role != controlTypes.ROLE_MATH
+			or reason not in (
+				controlTypes.REASON_CARET,
+				controlTypes.REASON_SAYALL
+			)
+	)):
 		textList.append(translate(roleText) if roleText else controlTypes.roleLabels[role])
 	if value:
 		textList.append(translate(value))
@@ -140,11 +163,16 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
 	realStates=propertyValues.get('_states',states)
 	negativeStates=propertyValues.get('negativeStates',set())
 	if states or negativeStates:
-		textList.extend(controlTypes.processAndLabelStates(role, realStates, reason, states, negativeStates))
-	if 'description' in propertyValues:
-		textList.append(translate(propertyValues['description']))
-	if 'keyboardShortcut' in propertyValues:
-		textList.append(propertyValues['keyboardShortcut'])
+		labelStates = controlTypes.processAndLabelStates(role, realStates, reason, states, negativeStates)
+		textList.extend(labelStates)
+	# sometimes description key is present but value is None
+	description: Optional[str] = propertyValues.get('description')
+	if description:
+		textList.append(translate(description))
+	# sometimes keyboardShortcut key is present but value is None
+	keyboardShortcut: Optional[str] = propertyValues.get('keyboardShortcut')
+	if keyboardShortcut:
+		textList.append(keyboardShortcut)
 	if includeTableCellCoords and cellCoordsText:
 		textList.append(cellCoordsText)
 	if cellCoordsText or rowNumber or columnNumber:
@@ -154,87 +182,103 @@ def getSpeechTextForProperties(reason=controlTypes.REASON_QUERY,**propertyValues
 		# Don't update the oldTableID if no tableID was given.
 		if tableID and not sameTable:
 			oldTableID = tableID
-			rowSpan = propertyValues.get("rowSpan")
-			columnSpan = propertyValues.get("columnSpan")
-			if rowNumber and (not sameTable or rowNumber != oldRowNumber or rowSpan != oldRowSpan):
-				rowHeaderText = propertyValues.get("rowHeaderText")
-				if rowHeaderText:
-					textList.append(translate(rowHeaderText))
-					if includeTableCellCoords and not cellCoordsText: 
-						# Translators: Speaks current row number (example output: row 3).
-						textList.append(_("row %s")%rowNumber)
-						if rowSpan>1 and columnSpan<=1:
-							# Translators: Speaks the row span added to the current row number (example output: through 5).
-							textList.append(_("through %s")%(rowNumber+rowSpan-1))
-					oldRowNumber = rowNumber
-					oldRowSpan = rowSpan
-			if columnNumber and (not sameTable or columnNumber != oldColumnNumber or columnSpan != oldColumnSpan):
-				columnHeaderText = propertyValues.get("columnHeaderText")
-				if columnHeaderText:
-					textList.append(translate(columnHeaderText))
-					if includeTableCellCoords and not cellCoordsText:
-						# Translators: Speaks current column number (example output: column 3).
-						textList.append(_("column %s")%columnNumber)
-						if columnSpan>1 and rowSpan<=1:
-							# Translators: Speaks the column span added to the current column number (example output: through 5).
-							textList.append(_("through %s")%(columnNumber+columnSpan-1))
-					oldColumnNumber = columnNumber
-					oldColumnSpan = columnSpan
-			if includeTableCellCoords and not cellCoordsText and rowSpan>1 and columnSpan>1:
-				# Translators: Speaks the row and column span added to the current row and column numbers
-				#						 (example output: through row 5 column 3).
-				textList.append(_("through row {row} column {column}").format(
-					row=rowNumber+rowSpan-1,
-					column=columnNumber+columnSpan-1
-				))
+		# When fetching row and column span
+		# default the values to 1 to make further checks a lot simpler.
+		# After all, a table cell that has no rowspan implemented is assumed to span one row.
+		rowSpan = propertyValues.get("rowSpan") or 1
+		columnSpan = propertyValues.get("columnSpan") or 1
+		if rowNumber and (not sameTable or rowNumber != oldRowNumber or rowSpan != oldRowSpan):
+			rowHeaderText: Optional[str] = propertyValues.get("rowHeaderText")
+			if rowHeaderText:
+				textList.append(rowHeaderText)
+			if includeTableCellCoords and not cellCoordsText: 
+				# Translators: Speaks current row number (example output: row 3).
+				rowNumberTranslation: str = _("row %s") % rowNumber
+				textList.append(rowNumberTranslation)
+				if rowSpan>1 and columnSpan<=1:
+					# Translators: Speaks the row span added to the current row number (example output: through 5).
+					rowSpanAddedTranslation: str = _("through %s") % (rowNumber + rowSpan - 1)
+					textList.append(rowSpanAddedTranslation)
+			oldRowNumber = rowNumber
+			oldRowSpan = rowSpan
+		if columnNumber and (not sameTable or columnNumber != oldColumnNumber or columnSpan != oldColumnSpan):
+			columnHeaderText: Optional[str] = propertyValues.get("columnHeaderText")
+			if columnHeaderText:
+				textList.append(translate(columnHeaderText))
+			if includeTableCellCoords and not cellCoordsText:
+				# Translators: Speaks current column number (example output: column 3).
+				colNumberTranslation: str = _("column %s") % columnNumber
+				textList.append(colNumberTranslation)
+				if columnSpan>1 and rowSpan<=1:
+					# Translators: Speaks the column span added to the current column number (example output: through 5).
+					colSpanAddedTranslation: str = _("through %s") % (columnNumber + columnSpan - 1)
+					textList.append(colSpanAddedTranslation)
+			oldColumnNumber = columnNumber
+			oldColumnSpan = columnSpan
+		if includeTableCellCoords and not cellCoordsText and rowSpan>1 and columnSpan>1:
+			# Translators: Speaks the row and column span added to the current row and column numbers
+			#			(example output: through row 5 column 3).
+			rowColSpanTranslation: str = _("through row {row} column {column}").format(
+				row=rowNumber + rowSpan - 1,
+				column=columnNumber + columnSpan - 1
+			)
+			textList.append(rowColSpanTranslation)
 	rowCount=propertyValues.get('rowCount',0)
 	columnCount=propertyValues.get('columnCount',0)
 	if rowCount and columnCount:
 		# Translators: Speaks number of columns and rows in a table (example output: with 3 rows and 2 columns).
-		textList.append(_("with {rowCount} rows and {columnCount} columns").format(rowCount=rowCount,columnCount=columnCount))
+		rowAndColCountTranslation: str = _("with {rowCount} rows and {columnCount} columns").format(
+			rowCount=rowCount,
+			columnCount=columnCount
+		)
+		textList.append(rowAndColCountTranslation)
 	elif columnCount and not rowCount:
 		# Translators: Speaks number of columns (example output: with 4 columns).
-		textList.append(_("with %s columns")%columnCount)
+		columnCountTransation: str = _("with %s columns") % columnCount
+		textList.append(columnCountTransation)
 	elif rowCount and not columnCount:
 		# Translators: Speaks number of rows (example output: with 2 rows).
-		textList.append(_("with %s rows")%rowCount)
+		rowCountTranslation: str = _("with %s rows") % rowCount
+		textList.append(rowCountTranslation)
 	if rowCount or columnCount:
 		# The caller is entering a table, so ensure that it is treated as a new table, even if the previous table was the same.
 		oldTableID = None
 	ariaCurrent = propertyValues.get('current', False)
 	if ariaCurrent:
 		try:
-			textList.append(controlTypes.isCurrentLabels[ariaCurrent])
+			ariaCurrentLabel = controlTypes.isCurrentLabels[ariaCurrent]
+			textList.append(ariaCurrentLabel)
 		except KeyError:
 			log.debugWarning("Aria-current value not handled: %s"%ariaCurrent)
-			textList.append(controlTypes.isCurrentLabels[True])
-	placeholder = propertyValues.get('placeholder', None)
+			ariaCurrentLabel = controlTypes.isCurrentLabels[True]
+			textList.append(ariaCurrentLabel)
+	placeholder: Optional[str] = propertyValues.get('placeholder', None)
 	if placeholder:
-		textList.append(placeholder)
+		textList.append(translate(placeholder))
 	indexInGroup=propertyValues.get('positionInfo_indexInGroup',0)
 	similarItemsInGroup=propertyValues.get('positionInfo_similarItemsInGroup',0)
 	if 0<indexInGroup<=similarItemsInGroup:
 		# Translators: Spoken to indicate the position of an item in a group of items (such as a list).
 		# {number} is replaced with the number of the item in the group.
 		# {total} is replaced with the total number of items in the group.
-		textList.append(_("{number} of {total}").format(number=indexInGroup, total=similarItemsInGroup))
+		itemPosTranslation: str = _("{number} of {total}").format(
+			number=indexInGroup,
+			total=similarItemsInGroup
+		)
+		textList.append(itemPosTranslation)
 	if 'positionInfo_level' in propertyValues:
 		level=propertyValues.get('positionInfo_level',None)
 		role=propertyValues.get('role',None)
 		if level is not None:
+			# Translators: Speaks the item level in treeviews (example output: level 2).
+			levelTranslation: str = _('level %s') % level
 			if role in (controlTypes.ROLE_TREEVIEWITEM,controlTypes.ROLE_LISTITEM) and level!=oldTreeLevel:
-				textList.insert(0,_("level %s")%level)
+				textList.insert(0, levelTranslation)
 				oldTreeLevel=level
 			else:
-				# Translators: Speaks the item level in treeviews (example output: level 2).
-				textList.append(_('level %s')%propertyValues['positionInfo_level'])
-	speech.oldTreeLevel = oldTreeLevel
-	speech.oldTableID = oldTableID
-	speech.oldRowNumber = oldRowNumber
-	speech.oldRowSpan = oldRowSpan
-	speech.oldColumnNumber = oldColumnNumber
-	speech.oldColumnSpan = oldColumnSpan
-	return speech.CHUNK_SEPARATOR.join([x for x in textList if x])
+				textList.append(levelTranslation)
+	types.logBadSequenceTypes(textList)
+	return textList
 
 #
 ## End of NVDA sources/speech.py functions.
@@ -251,7 +295,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def __init__(self):
 		"""Initializes the global plugin object."""
 		super(globalPluginHandler.GlobalPlugin, self).__init__()
-		global _nvdaSpeakText, _nvdaGetSpeechTextForProperties, _nvdaSpeak, _gpObject
+		global _nvdaGetPropertiesSpeech, _nvdaSpeak, _gpObject
 		
 		# if on a secure Desktop, disable the Add-on
 		if globalVars.appArgs.secure: return
@@ -268,18 +312,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				self.language = 'en'
 				
 		logHandler.log.info("Translate module initialized, translating to %s" %(self.language))
-		_nvdaSpeak = speech.speak
-		_nvdaGetSpeechTextForProperties = speech.getSpeechTextForProperties
-		speech.speak = speak
-		speech.getSpeechTextForProperties = getSpeechTextForProperties
+
+		_nvdaSpeak = speech._manager.speak
+		_nvdaGetPropertiesSpeech = speech.getPropertiesSpeech
+		speech._manager.speak = speak
+		speech.getPropertiesSpeech = _nvdaGetPropertiesSpeech
 		self.loadLocalCache()
 		
 
 	def terminate(self):
 		"""Called when this plugin is terminated, restoring all NVDA's methods."""
-		global _nvdaSpeakText, _nvdaGetSpeechTextForProperties, _nvdaSpeak
-		speech.speak = _nvdaSpeak
-		speech.getSpeechTextForProperties = _nvdaGetSpeechTextForProperties
+		global _nvdaGetPropertiesSpeech, _nvdaSpeak
+		speech._manager.speak = _nvdaSpeak
+		speech.getPropertiesSpeech = _nvdaGetPropertiesSpeech
 		self.saveLocalCache()
 
 	def loadLocalCache(self):
