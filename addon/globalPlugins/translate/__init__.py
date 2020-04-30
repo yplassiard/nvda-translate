@@ -45,6 +45,8 @@ _nvdaGetPropertiesSpeech = None
 _gpObject = None
 _lastError = 0
 _enableTranslation = False
+_lastTranslatedText = None
+_lastTranslatedTextTime = 0
 
 
 def translate(text):
@@ -73,8 +75,7 @@ Stores the result into the cache so that the same translation does not asks Goog
 		_translationCache[appName][text] = text
 		return text
 	if translated is None or len(translated) == 0:
-					translated = text
-		
+		translated = text
 	_translationCache[appName][text] = translated
 	return translated
 
@@ -85,7 +86,7 @@ Stores the result into the cache so that the same translation does not asks Goog
 
 def speak(speechSequence: SpeechSequence,
 					priority: Optional[Spri] = None):
-	global _enableTranslation
+	global _enableTranslation, _lastTranslatedText
 
 	if _enableTranslation is False:
 		return _nvdaSpeak(speechSequence=speechSequence, priority=priority)
@@ -97,6 +98,7 @@ def speak(speechSequence: SpeechSequence,
 		else:
 			newSpeechSequence.append(val)
 	_nvdaSpeak(speechSequence=newSpeechSequence, priority=priority)
+	_lastTranslatedText = " ".join(x if isinstance(x, str) else ""  for x in newSpeechSequence)
 
 #
 ## This is overloaded as well because the generated text may contain already translated text by
@@ -278,6 +280,8 @@ def getPropertiesSpeech(	# noqa: C901
 			else:
 				textList.append(levelTranslation)
 	types.logBadSequenceTypes(textList)
+	global _lastTranslatedText
+	_lastTranslatedText = " ".join(e for e in textList)
 	return textList
 
 #
@@ -383,6 +387,16 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	script_toggleTranslate.__doc__ = _("Enables translation to the desired language.")
 
+	def script_copyLastTranslation(self, gesture):
+		global _lastTranslatedText
+
+		if _lastTranslatedText is not None and len(_lastTranslatedText) > 0:
+			api.copyToClip(_lastTranslatedText)
+			ui.message(_("translation {text} ¨copied to clipboard".format(text=_lastTranslatedText)))
+		else:
+			ui.message(_("No translation to copy"))
+	script_copyLastTranslation.__doc__ = _("Copy the latest translated text to the clipboard.")
+								 
 	def script_flushAllCache(self, gesture):
 		if scriptHandler.getLastScriptRepeatCount() == 0:
 			ui.message(_("Press twice to delete all cached translations for all applications."))
@@ -434,6 +448,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	__gestures = {
 		"kb:nvda+shift+control+t": "toggleTranslate",
+		"kb:nvda+shift+c": "copyLastTranslation",
 		"kb:nvda+shift+control+f": "flushAllCache",
 		"kb:nvda+shift+f": "flushCurrentAppCache",
 	}
