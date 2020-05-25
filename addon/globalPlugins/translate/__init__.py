@@ -66,17 +66,17 @@ Stores the result into the cache so that the same translation does not asks Goog
 	if appTable is None:
 		_translationCache[appName] = {}
 	translated = _translationCache[appName].get(text, None)
-	if translated is not None:
+	if translated is not None and translated != text:
 		return translated
 	try:
 		prepared = text.encode('utf8', ':/')
 		translated = mtranslate.translate(prepared, _gpObject.language)
 	except Exception as e:
-		_translationCache[appName][text] = text
 		return text
 	if translated is None or len(translated) == 0:
 		translated = text
-	_translationCache[appName][text] = translated
+	else:
+		_translationCache[appName][text] = translated
 	return translated
 
 
@@ -98,7 +98,7 @@ def speak(speechSequence: SpeechSequence,
 		else:
 			newSpeechSequence.append(val)
 	_nvdaSpeak(speechSequence=newSpeechSequence, priority=priority)
-	_lastTranslatedText = " ".join(x if isinstance(x, str) else ""  for x in newSpeechSequence)
+	_lastTranslatedText = " ".join(x if isinstance(x, str) else ""	for x in newSpeechSequence)
 
 #
 ## This is overloaded as well because the generated text may contain already translated text by
