@@ -79,7 +79,7 @@ def translate(to_translate, to_language="auto", from_language="auto"):
         request = urllib.request.Request(link, headers=agent)
         raw_data = urllib.request.urlopen(request).read()
     data = raw_data.decode("utf-8")
-    expr = r'class="t0">(.*?)<'
+    expr = r'class="result-container">(.*?)<'
     re_result = re.findall(expr, data)
     if (len(re_result) == 0):
         result = ""

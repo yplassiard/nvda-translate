@@ -1,8 +1,7 @@
 # nvda-translate
 Make NVDA translate any spoken text to the desired language.
 ## Download
-- Stable: [translate-2019.09.3](http://www.mtyp.fr/nvda/translate/translate-2019.09.3.nvda-addon).
-- Stable (NVDA 2019.3+): [translate-2020.06](http://www.mtyp.fr/nvda/translate/translate-2020.06.nvda-addon).
+- Stable (NVDA 2019.3+): [translate-2021.01](http://www.mtyp.fr/nvda/translate/translate-2021.01.nvda-addon).
 
 ## Installation
 
@@ -40,3 +39,8 @@ Of course, the more bandwidth you have, the faster the translation will happen.
 - Of course, Pull Requests are also welcomed if you want to extend the add-on or fix any issue.
 - To contact me, you can use the address: [contact author](mailto:podcastcecitek@gmail.com)
 
+
+## Contributors
+Thanks to everyone who made this extension a reality, including all of you who spent some time testing and reporting bugs.
+
+Among others, I'd like give a special thank you to Hxebolax, who found and fixed the bug that prevented the add-on to work for months in 2020.
