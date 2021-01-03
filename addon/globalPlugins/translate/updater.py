@@ -42,7 +42,7 @@ class TranslateUpdater(threading.Thread):
             
                 
                                        
-        logHandler.log.ingo("Translate: exiting update thred...")
+        logHandler.log.info("Translate: exiting update thred...")
     def getLatestVersion(self, mod):
         import addonHandler
         actual = None
