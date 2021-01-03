@@ -2,7 +2,7 @@
 import logHandler
 import config
 ADDON_NAME = "translate"
-UPDATE_CHECK_INTERVAL = 60
+UPDATE_CHECK_INTERVAL = 1200
 
 import threading
 import time

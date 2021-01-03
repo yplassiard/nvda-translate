@@ -322,7 +322,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 self.inTimer = False
                 self.hasBeenUpdated = False
                 wx.CallLater(1000, self.onTimer)
-                logHandler.log.info("Translate module initialized, translating to %s" %(self.language))
+                import addonHandler
+                version = None
+                for addon in addonHandler.getAvailableAddons():
+                        if addon.name == "translate":
+                                version = addon.version
+                if version is None:
+                        version = 'unknown'
+                logHandler.log.info("Translate (%s) initialized, translating to %s" %(version, self.language))
 
                 _nvdaSpeak = speech._manager.speak
                 _nvdaGetPropertiesSpeech = speech.getPropertiesSpeech
