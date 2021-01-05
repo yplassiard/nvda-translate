@@ -317,7 +317,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                                 self.language = languageHandler.getWindowsLanguage()[:2]
                         except:
                                 self.language = 'en'
-                self.updater = updater.TranslateUpdater()
+                self.updater = updater.ExtensionUpdater()
                 self.updater.start()
                 self.inTimer = False
                 self.hasBeenUpdated = False
@@ -344,6 +344,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 speech._manager.speak = _nvdaSpeak
                 speech.getPropertiesSpeech = _nvdaGetPropertiesSpeech
                 self.saveLocalCache()
+                self.updater.quit = True
+                self.updater.join()
         def onTimer(self):
                 if self.inTimer is True or self.hasBeenUpdated is True:
                         return

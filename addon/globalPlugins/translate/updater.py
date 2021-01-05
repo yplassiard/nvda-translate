@@ -11,9 +11,8 @@ import urllib
 import json
 import os
 
-class TranslateUpdater(threading.Thread):
+class ExtensionUpdater(threading.Thread):
     quit = False
-    quitLock = threading.RLock()
     queue = queue.Queue()
 
     def run(self):
@@ -22,7 +21,6 @@ class TranslateUpdater(threading.Thread):
             time.sleep(1)
             if time.time() - self.lastCheck < UPDATE_CHECK_INTERVAL:
                 continue
-            logHandler.log.info("translate: Checking for update...")
             try:
                 res = urllib.request.urlopen("http://www.mtyp.fr/nvda")
                 data = res.read()
@@ -31,7 +29,7 @@ class TranslateUpdater(threading.Thread):
                 if mod is not None:
                     new_version = self.getLatestVersion(mod)
                     if new_version is not None:
-                        logHandler.log.info("Translate update available: %s" %(new_version["version"]))
+                        logHandler.log.info("%s update available: %s" %(ADDON_NAME, new_version["version"]))
                         self.queue.put({"update": new_version})
                         self.download(new_version)
             except Exception as ex:
@@ -42,7 +40,7 @@ class TranslateUpdater(threading.Thread):
             
                 
                                        
-        logHandler.log.info("Translate: exiting update thred...")
+        logHandler.log.info("%s: exiting update thred..." %(ADDON_NAME))
     def getLatestVersion(self, mod):
         import addonHandler
         actual = None
@@ -73,7 +71,7 @@ class TranslateUpdater(threading.Thread):
             f.write(res.read())
             f.close()
         except Exception as ex:
-            logHandler.log.error("Translate: failed to download %s: %s" %(mod["url"], ex))
+            logHandler.log.error("%s: failed to download %s: %s" %(ADDON_NAME, mod["url"], ex))
             return False
         self.queue.put({"download": tmp,
                         "version": mod["version"]})
