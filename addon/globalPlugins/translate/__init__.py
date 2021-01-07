@@ -358,6 +358,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         filepath = evt.get("download", None)
                         if filepath is not None:
                                 import addonHandler
+                                for prev in addonHandler.getAvailableAddons():
+                                        if prev.name == updater.ADDON_NAME:
+                                                prev.requestRemove()
                                 bundle = addonHandler.AddonBundle(filepath)
                                 addonHandler.installAddonBundle(bundle)
                                 logHandler.log.info("Installed version %s, restart NVDA to make the changes permanent" %(evt["version"]))
