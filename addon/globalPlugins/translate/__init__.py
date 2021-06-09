@@ -16,26 +16,22 @@
 import os, sys, time, codecs, re
 import globalVars
 import globalPluginHandler, logHandler, scriptHandler
-try:
-        import api, controlTypes
-        import ui, wx, gui
-        import core, config
-        import wx
-        import speech
-        from speech import *
-        import json
-        import queue
-        curDir = os.path.abspath(os.path.dirname(__file__))
-
-        sys.path.insert(0, curDir)
-        sys.path.insert(0, os.path.join(curDir, "html"))
-        import markupbase
-        import mtranslate
-        import updater
-        import addonHandler, languageHandler
-except Exception as e:
-        logHandler.log.exception("Failed to initialize translate addon", e)
-        raise e
+import api, controlTypes
+import ui, wx, gui
+import core, config
+import wx
+import speech
+from speech import *
+import json
+import queue
+curDir = os.path.abspath(os.path.dirname(__file__))
+logHandler.log.info("Importing modules from %s" % curDir)
+sys.path.insert(0, curDir)
+sys.path.insert(0, os.path.join(curDir, "html"))
+import markupbase
+import mtranslate
+import updater
+import addonHandler, languageHandler
 
 addonHandler.initTranslation()
 #
@@ -88,7 +84,7 @@ Stores the result into the cache so that the same translation does not asks Goog
 #
 
 def speak(speechSequence: SpeechSequence,
-                                        priority: Optional[Spri] = None):
+                                        priority: Spri = None):
         global _enableTranslation, _lastTranslatedText
 
         if _enableTranslation is False:
@@ -110,7 +106,7 @@ def speak(speechSequence: SpeechSequence,
 #
 
 def getPropertiesSpeech(        # noqa: C901
-                reason = controlTypes.REASON_QUERY,
+                reason = controlTypes.OutputReason.QUERY,
                 **propertyValues
 ):
         global oldTreeLevel, oldTableID, oldRowNumber, oldRowSpan, oldColumnNumber, oldColumnSpan
@@ -141,9 +137,9 @@ def getPropertiesSpeech(        # noqa: C901
                 and (
                         roleText
                         or reason not in (
-                                controlTypes.REASON_SAYALL,
-                                controlTypes.REASON_CARET,
-                                controlTypes.REASON_FOCUS
+                                controlTypes.OutputReason.SAYALL,
+                                controlTypes.OutputReason.CARET,
+                                controlTypes.OutputReason.FOCUS
                         )
                         or not (
                                 name
@@ -157,8 +153,8 @@ def getPropertiesSpeech(        # noqa: C901
                 and (
                         role != controlTypes.ROLE_MATH
                         or reason not in (
-                                controlTypes.REASON_CARET,
-                                controlTypes.REASON_SAYALL
+                                controlTypes.OutputReason.CARET,
+                                controlTypes.OutputReason.SAYALL
                         )
         )):
                 textList.append(translate(roleText) if roleText else controlTypes.roleLabels[role])
