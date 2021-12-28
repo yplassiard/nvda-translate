@@ -379,7 +379,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         # Scan stored files and load them.
                 
                 for entry in os.listdir(path):
-                        m = re.match("(.*)\.json$", entry)
+                        m = re.match("(.*).json$", entry)
                         if m is not None:
                                 appName = m.group(1)
                                 try:

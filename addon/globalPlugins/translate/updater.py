@@ -1,8 +1,9 @@
 # *-* coding: utf-8 *-*
 import logHandler
+import versionInfo
 import config
 ADDON_NAME = "translate"
-UPDATE_CHECK_INTERVAL = 1200
+UPDATE_CHECK_INTERVAL = 3600
 
 import threading
 import time
@@ -60,7 +61,16 @@ class ExtensionUpdater(threading.Thread):
         target = None
         for version in mod["versions"]:
             if version["version"] > actual.version:
-                target = version
+                meta = version.get("metadata", None)
+                logHandler.log.info("Metadata: %s" %(meta))
+                if meta is not None and meta != "false" and meta != False:
+                    if meta["minimumNVDAVersion"] > versionInfo.version or meta["lastTestedNVDAVersion"] < versionInfo.version:
+                        logHandler.log.debug("Discarding version %s: incompatible version" %(version["version"]))
+                        continue
+                if target is not None and target["version"] < version["version"]:
+                    target = version
+                elif target is None:
+                    target = version
         return target
     
     def download(self, mod):
