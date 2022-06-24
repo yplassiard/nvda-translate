@@ -1,7 +1,7 @@
 # nvda-translate
 Make NVDA translate any spoken text to the desired language.
 ## Download
-- Stable (NVDA 2021.1+): [translate-2021.12.28](http://www.mtyp.fr/nvda/translate/translate-2021.12.28.nvda-addon).
+- Stable (NVDA 2021.1+): [translate-2021.12.28](http://www.mtyp.fr/nvda/translate/translate-2022.06.24.nvda-addon).
 - Discontinued (NVDA 2019.3 to 2020.4): [translate-2021.01.3](http://www.mtyp.fr/nvda/translate/translate-2021.01.3.nvda-addon).
 
 ## Installation
