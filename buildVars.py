@@ -26,7 +26,7 @@ addon_info = {
 	"addon_description": _("""Uses the Google Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection."""),
 	# version
-	"addon_version": "2021.12.28",
+	"addon_version": "2022.06.24",
 	# Author(s)
 	"addon_author": u"Yannick PLASSIARD <podcastcecitek@gmail.com>, Hxebolax",
 	# URL for the add-on documentation support
@@ -36,7 +36,7 @@ This add-on requires an internet connection."""),
 	# Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
 	"addon_minimumNVDAVersion": "2021.1",
 	# Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion": "2021.3",
+	"addon_lastTestedNVDAVersion": "2023.1",
 	# Add-on update channel (default is None, denoting stable releases,
 	# and for development releases, use "dev".)
 	# Do not change unless you know what you are doing!
