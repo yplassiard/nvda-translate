@@ -425,7 +425,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
                 if _lastTranslatedText is not None and len(_lastTranslatedText) > 0:
                         api.copyToClip(_lastTranslatedText)
-                        ui.message(_("translation {text} ¨copied to clipboard".format(text=_lastTranslatedText)))
+                        ui.message(_("translation {text} ¨copied to clipboard").format(text=_lastTranslatedText))
                 else:
                         ui.message(_("No translation to copy"))
         script_copyLastTranslation.__doc__ = _("Copy the latest translated text to the clipboard.")
@@ -457,7 +457,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         ui.message(_("No focused application"))
                         return
                 if scriptHandler.getLastScriptRepeatCount() == 0:
-                        ui.message(_("Press twice to delete all translations for {app}".format(app=appName)))
+                        ui.message(_("Press twice to delete all translations for {app}").format(app=appName))
                         return
                 
                 global _translationCache
@@ -471,9 +471,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                                 logHandler.log.error("Failed to remove cache for {appName}: {e}".format(appName=appName, e=e))
                                 ui.message(_("Error while deleting application's translation cache."))
                                 return
-                        ui.message(_("Translation cache for {app} has been deleted.".format(app=appName)))
+                        ui.message(_("Translation cache for {app} has been deleted.").format(app=appName))
                 else:
-                        ui.message(_("No saved translations for {app}".format(app=appName)))
+                        ui.message(_("No saved translations for {app}").format(app=appName))
                         
         script_flushCurrentAppCache.__doc__ = _("Remove translation cache for the currently focused application")
                                                                                                                                 
