@@ -1,0 +1,166 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 'translate' '2022.06.24'\n"
+"Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
+"POT-Creation-Date: 2022-06-27 19:17+0200\n"
+"PO-Revision-Date: 2022-06-27 19:25+0100\n"
+"Last-Translator: Nikola Jović <wwenikola123@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.10\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: sr\n"
+
+#. Translators: Speaks current row number (example output: row 3).
+#: addon\globalPlugins\translate\__init__.py:197
+#, python-format
+msgid "row %s"
+msgstr "Red %s"
+
+#. Translators: Speaks the row span added to the current row number (example output: through 5).
+#. Translators: Speaks the column span added to the current column number (example output: through 5).
+#: addon\globalPlugins\translate\__init__.py:201
+#: addon\globalPlugins\translate\__init__.py:215
+#, python-format
+msgid "through %s"
+msgstr "Do %s"
+
+#. Translators: Speaks current column number (example output: column 3).
+#: addon\globalPlugins\translate\__init__.py:211
+#, python-format
+msgid "column %s"
+msgstr "Kolona %s"
+
+#. Translators: Speaks the row and column span added to the current row and column numbers
+#. (example output: through row 5 column 3).
+#: addon\globalPlugins\translate\__init__.py:222
+#, python-brace-format
+msgid "through row {row} column {column}"
+msgstr "Kroz red {row} kolonu {column}"
+
+#. Translators: Speaks number of columns and rows in a table (example output: with 3 rows and 2 columns).
+#: addon\globalPlugins\translate\__init__.py:231
+#, python-brace-format
+msgid "with {rowCount} rows and {columnCount} columns"
+msgstr "Sa {rowCount} redova i {columnCount} kolona"
+
+#. Translators: Speaks number of columns (example output: with 4 columns).
+#: addon\globalPlugins\translate\__init__.py:238
+#, python-format
+msgid "with %s columns"
+msgstr "Sa %s kolona"
+
+#. Translators: Speaks number of rows (example output: with 2 rows).
+#: addon\globalPlugins\translate\__init__.py:242
+#, python-format
+msgid "with %s rows"
+msgstr "Sa %s redova"
+
+#. Translators: Spoken to indicate the position of an item in a group of items (such as a list).
+#. {number} is replaced with the number of the item in the group.
+#. {total} is replaced with the total number of items in the group.
+#: addon\globalPlugins\translate\__init__.py:265
+#, python-brace-format
+msgid "{number} of {total}"
+msgstr "{number} od {total}"
+
+#. Translators: Speaks the item level in treeviews (example output: level 2).
+#: addon\globalPlugins\translate\__init__.py:275
+#, python-format
+msgid "level %s"
+msgstr "Nivo %s"
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on
+#. to be shown on installation and add-on information found in Add-ons Manager.
+#: addon\globalPlugins\translate\__init__.py:295 buildVars.py:23
+msgid "Translate"
+msgstr "Prevođenje"
+
+#: addon\globalPlugins\translate\__init__.py:417
+msgid "Translation enabled."
+msgstr "Prevođenje omogućeno."
+
+#: addon\globalPlugins\translate\__init__.py:419
+msgid "Translation disabled."
+msgstr "Prevođenje onemogućeno."
+
+#: addon\globalPlugins\translate\__init__.py:421
+msgid "Enables translation to the desired language."
+msgstr "Uključuje prevođenje na željeni jezik."
+
+#: addon\globalPlugins\translate\__init__.py:428
+#, python-brace-format
+msgid "translation {text} ¨copied to clipboard"
+msgstr "Prevod {text} kopiran u privremenu memoriju"
+
+#: addon\globalPlugins\translate\__init__.py:430
+msgid "No translation to copy"
+msgstr "Nema prevoda za kopiranje"
+
+#: addon\globalPlugins\translate\__init__.py:431
+msgid "Copy the latest translated text to the clipboard."
+msgstr "Kopira poslednji preveden tekst u privremenu memoriju."
+
+#: addon\globalPlugins\translate\__init__.py:435
+msgid "Press twice to delete all cached translations for all applications."
+msgstr "Pritisnite dva puta da obrišete keš prevoda za sve aplikacije."
+
+#: addon\globalPlugins\translate\__init__.py:448
+msgid "All translations have been deleted."
+msgstr "Svi prevodi su obrisani."
+
+#: addon\globalPlugins\translate\__init__.py:450
+msgid "Some caches failed to be removed."
+msgstr "Deo keša nije uspešno obrisan."
+
+#: addon\globalPlugins\translate\__init__.py:451
+msgid "Remove all cached translations for all applications."
+msgstr "Ukloni keš prevoda za sve aplikacije."
+
+#: addon\globalPlugins\translate\__init__.py:457
+msgid "No focused application"
+msgstr "Nijedna aplikacija nije fokusirana"
+
+#: addon\globalPlugins\translate\__init__.py:460
+#, python-brace-format
+msgid "Press twice to delete all translations for {app}"
+msgstr "Pritisnite dva puta da obrišete sve prevode za {app}"
+
+#: addon\globalPlugins\translate\__init__.py:472
+msgid "Error while deleting application's translation cache."
+msgstr "Greška pri brisanju keša prevoda za aplikaciju."
+
+#: addon\globalPlugins\translate\__init__.py:474
+#, python-brace-format
+msgid "Translation cache for {app} has been deleted."
+msgstr "Keš prevoda za {app} je obrisan."
+
+#: addon\globalPlugins\translate\__init__.py:476
+#, python-brace-format
+msgid "No saved translations for {app}"
+msgstr "Nema sačuvanih prevoda za {app}"
+
+#: addon\globalPlugins\translate\__init__.py:478
+msgid "Remove translation cache for the currently focused application"
+msgstr "Ukloni keš prevoda za trenutno fokusiranu aplikaciju"
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+#: buildVars.py:26
+msgid ""
+"Uses the Google Translate API to translate each spoken text to the desired "
+"language, on the fly.\n"
+"This add-on requires an internet connection."
+msgstr ""
+"Koristi Google Translate API za prevođenje svakog izgovorenog teksta na "
+"željeni jezik, odmah nakon što se izgovori.\n"
+"Ovom dodatku je neophodna veza sa Internetom."
