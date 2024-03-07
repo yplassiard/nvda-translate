@@ -1,17 +1,12 @@
 # *-* coding: utf-8 *-*
 # translate/__init__.py
 #A part of the NVDA Translate add-on
-#Copyright (C) 2018 Yannick PLASSIARD
+#This file is based on original work by Yannick PLASSIARD
 #This file is covered by the GNU General Public License.
 #See the file LICENSE for more details.
 #This add-on also uses the following external libraries:
 #markupbase, htmlentitydefs, HTMLParser: Come from the Python2 standard installation.
-#mtranslate: MIT License
-
-# Moreover, the mtranslate package relies on URLLib, part of Python2 standard installation to
-# connect to the Google Translate server.
-
-
+#deepl-python: MIT License
 
 import os, sys, time, codecs, re
 import globalVars
@@ -20,6 +15,7 @@ import api, controlTypes
 import ui, wx, gui
 import core, config
 import wx
+from gui.settingsDialogs import SettingsPanel
 import speech
 from speech import *
 import json
@@ -29,7 +25,7 @@ logHandler.log.info("Importing modules from %s" % curDir)
 sys.path.insert(0, curDir)
 sys.path.insert(0, os.path.join(curDir, "html"))
 import markupbase
-import mtranslate
+import deepl
 import updater
 import addonHandler, languageHandler
 
@@ -46,13 +42,34 @@ _lastError = 0
 _enableTranslation = False
 _lastTranslatedText = None
 _lastTranslatedTextTime = 0
+if config.conf.get('translate') is not None:
+	_authKey = config.conf['translate']['apikey']
+else:
+	_authKey = ""
 
+class TranslateSettings(SettingsPanel):
+	# Translators: This is the label for the IBMTTS settings category in NVDA Settings screen.
+	title = _("Translate")
+
+	def makeSettings(self, settingsSizer):
+		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
+		self._apikey  = sHelper.addLabeledControl(_("Deepl API key"), wx.TextCtrl)
+		if config.conf.get('translate') is not None:
+			self._apikey.SetValue(config.conf['translate']['apikey'])
+		else:
+			self._apikey.SetValue("")
+
+	def onSave(self):
+		global _authKey
+		_authKey = self._apikey.GetValue()
+		config.conf['translate']['apikey'] = self._apikey.GetValue()
+		_translator = deepl.Translator(_authKey)
 
 def translate(text):
         """translates the given text to the desired language.
-Stores the result into the cache so that the same translation does not asks Google servers too often.
+Stores the result into the cache so that the same translation does not asks deepl servers too often.
         """
-        global _translationCache, _enableTranslation, _gpObject
+        global _translationCache, _enableTranslation, _gpObject, _authKey, _translator
 
         try:
                 appName = globalVars.focusObject.appModule.appName
@@ -66,17 +83,23 @@ Stores the result into the cache so that the same translation does not asks Goog
                 _translationCache[appName] = {}
         translated = _translationCache[appName].get(text, None)
         if translated is not None and translated != text:
-                return translated
+                return " " + translated + " "
         try:
-                prepared = text.encode('utf8', ':/')
-                translated = mtranslate.translate(prepared, _gpObject.language)
+                prepared = text
+
+                if _translator is not None:
+                                  translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language)
+                                  translated = translatedRes.text
+                else:
+                                  ui.message(_("You must place an API key in settings before translation."))
+
         except Exception as e:
-                return text
+                return str(e)
         if translated is None or len(translated) == 0:
                 translated = text
         else:
                 _translationCache[appName][text] = translated
-        return translated
+        return " " + translated + " "
 
 
 #
@@ -298,7 +321,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         def __init__(self):
                 """Initializes the global plugin object."""
                 super(globalPluginHandler.GlobalPlugin, self).__init__()
-                global _nvdaGetPropertiesSpeech, _nvdaSpeak, _gpObject
+                global _nvdaGetPropertiesSpeech, _nvdaSpeak, _gpObject, _translator
                 
                 # if on a secure Desktop, disable the Add-on
                 if globalVars.appArgs.secure: return
@@ -310,9 +333,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         pass
                 if self.language is None or self.language == 'Windows':
                         try:
-                                self.language = languageHandler.getWindowsLanguage()[:2]
+                                self.language = languageHandler.getWindowsLanguage().replace("_", "-")
                         except:
-                                self.language = 'en'
+                                self.language = 'en-us'
+
+                if config.conf.get('translate') is not None:
+                  _translator = deepl.Translator(_authKey)
+                else:
+                  logHandler.log.error("Please give an API key in the configuration.")
+                config.conf.spec['translate'] = {
+                  'apikey': 'string',
+                }
+                gui.settingsDialogs.NVDASettingsDialog.categoryClasses.append(TranslateSettings)
                 self.updater = updater.ExtensionUpdater()
                 self.updater.start()
                 self.inTimer = False

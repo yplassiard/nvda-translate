@@ -23,12 +23,12 @@ addon_info = {
 	"addon_summary": _("Translate"),
 	# Add-on description
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-	"addon_description": _("""Uses the Google Translate API to translate each spoken text to the desired language, on the fly.
-This add-on requires an internet connection."""),
+	"addon_description": _("""Uses the deepl Translate API to translate each spoken text to the desired language, on the fly.
+This add-on requires an internet connection and a deepl API key."""),
 	# version
-	"addon_version": "2022.06.24",
+	"addon_version": "2024.03.11",
 	# Author(s)
-	"addon_author": u"Yannick PLASSIARD <podcastcecitek@gmail.com>, Hxebolax",
+	"addon_author": u"Samuel Proulx, based largely on work by Yannick PLASSIARD <podcastcecitek@gmail.com>, and Hxebolax",
 	# URL for the add-on documentation support
 	"addon_url": None,
 	# Documentation file name
@@ -36,7 +36,7 @@ This add-on requires an internet connection."""),
 	# Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
 	"addon_minimumNVDAVersion": "2021.1",
 	# Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion": "2023.1",
+	"addon_lastTestedNVDAVersion": "2024.1",
 	# Add-on update channel (default is None, denoting stable releases,
 	# and for development releases, use "dev".)
 	# Do not change unless you know what you are doing!
