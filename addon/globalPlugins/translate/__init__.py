@@ -42,7 +42,7 @@ _enableTranslation = False
 _lastTranslatedText = None
 _lastTranslatedTextTime = 0
 if config.conf.get('translate') is not None:
-	_authKey = config.conf['translate']['apikey']
+	_authKey = config.conf['translate'].get('apikey')
 else:
 	_authKey = ""
 
@@ -54,7 +54,7 @@ class TranslateSettings(SettingsPanel):
 		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
 		self._apikey  = sHelper.addLabeledControl(_("Deepl API key"), wx.TextCtrl)
 		if config.conf.get('translate') is not None:
-			self._apikey.SetValue(config.conf['translate']['apikey'])
+			self._apikey.SetValue(config.conf['translate'].get('apikey'))
 		else:
 			self._apikey.SetValue("")
 
