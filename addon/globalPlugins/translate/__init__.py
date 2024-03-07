@@ -338,7 +338,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         except:
                                 self.language = 'en-us'
 
-                if config.conf.get('translate') is not None:
+                if config.conf['translate'].get('apikey') is not None:
                   _translator = deepl.Translator(_authKey)
                 else:
                   logHandler.log.error("Please give an API key in the configuration.")
