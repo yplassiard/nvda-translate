@@ -64,7 +64,7 @@ class TranslateSettings(SettingsPanel):
 		config.conf['translate'] = {}
 		config.conf['translate']['apikey'] = self._apikey.GetValue()
 		_translator = ""
-		_translator = deepl.Translator(_authKey)
+		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-07.1")
 
 def translate(text):
         """translates the given text to the desired language.
@@ -88,7 +88,7 @@ Stores the result into the cache so that the same translation does not asks deep
         try:
                 prepared = text
 
-                if _translator is not None:
+                if hasattr(_translator, "translate_text"):
                                   translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language)
                                   translated = translatedRes.text
                 else:
@@ -339,7 +339,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                                 self.language = 'en-us'
 
                 if config.conf['translate'].get('apikey') is not None:
-                  _translator = deepl.Translator(_authKey)
+                  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-07.1")
                 else:
                   logHandler.log.error("Please give an API key in the configuration.")
                 config.conf.spec['translate'] = {"apikey": "string(default='none')",}
