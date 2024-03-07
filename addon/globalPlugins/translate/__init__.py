@@ -5,7 +5,7 @@
 #This file is covered by the GNU General Public License.
 #See the file LICENSE for more details.
 #This add-on also uses the following external libraries:
-#markupbase, htmlentitydefs, HTMLParser: Come from the Python2 standard installation.
+#markupbase, htmlentitydefs, HTMLParser: Come from the Python standard installation.
 #deepl-python: MIT License
 
 import os, sys, time, codecs, re
@@ -26,7 +26,6 @@ sys.path.insert(0, curDir)
 sys.path.insert(0, os.path.join(curDir, "html"))
 import markupbase
 import deepl
-import updater
 import addonHandler, languageHandler
 
 addonHandler.initTranslation()
@@ -60,9 +59,11 @@ class TranslateSettings(SettingsPanel):
 			self._apikey.SetValue("")
 
 	def onSave(self):
-		global _authKey
+		global _authKey, _translator
 		_authKey = self._apikey.GetValue()
+		config.conf['translate'] = {}
 		config.conf['translate']['apikey'] = self._apikey.GetValue()
+		_translator = ""
 		_translator = deepl.Translator(_authKey)
 
 def translate(text):
@@ -341,15 +342,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                   _translator = deepl.Translator(_authKey)
                 else:
                   logHandler.log.error("Please give an API key in the configuration.")
-                config.conf.spec['translate'] = {
-                  'apikey': 'string',
-                }
+                config.conf.spec['translate'] = {"apikey": "string(default='none')",}
                 gui.settingsDialogs.NVDASettingsDialog.categoryClasses.append(TranslateSettings)
-                self.updater = updater.ExtensionUpdater()
-                self.updater.start()
-                self.inTimer = False
-                self.hasBeenUpdated = False
-                wx.CallLater(1000, self.onTimer)
                 import addonHandler
                 version = None
                 for addon in addonHandler.getAvailableAddons():
@@ -372,29 +366,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 speech._manager.speak = _nvdaSpeak
                 speech.getPropertiesSpeech = _nvdaGetPropertiesSpeech
                 self.saveLocalCache()
-                self.updater.quit = True
-                self.updater.join()
-        def onTimer(self):
-                if self.inTimer is True or self.hasBeenUpdated is True:
-                        return
-                self.inTimer = True
-                try:
-                        evt = self.updater.queue.get_nowait()
-                except queue.Empty:
-                        evt = None
-                if evt is not None:
-                        filepath = evt.get("download", None)
-                        if filepath is not None:
-                                import addonHandler
-                                for prev in addonHandler.getAvailableAddons():
-                                        if prev.name == updater.ADDON_NAME:
-                                                prev.requestRemove()
-                                bundle = addonHandler.AddonBundle(filepath)
-                                addonHandler.installAddonBundle(bundle)
-                                logHandler.log.info("Installed version %s, restart NVDA to make the changes permanent" %(evt["version"]))
-                                self.hasBeenUpdated = True
-                self.inTimer = False
-                wx.CallLater(1000, self.onTimer)
+                gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(TranslateSettings)
                 
         def loadLocalCache(self):
                 global _translationCache
