@@ -26,7 +26,7 @@ addon_info = {
 	"addon_description": _("""Uses the deepl Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection and a deepl API key."""),
 	# version
-	"addon_version": "2024.03.07",
+	"addon_version": "2024.03.08",
 	# Author(s)
 	"addon_author": u"Samuel Proulx, based largely on work by Yannick PLASSIARD <podcastcecitek@gmail.com>, and Hxebolax",
 	# URL for the add-on documentation support
@@ -34,7 +34,7 @@ This add-on requires an internet connection and a deepl API key."""),
 	# Documentation file name
 	"addon_docFileName": "readme.html",
 	# Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
-	"addon_minimumNVDAVersion": "2021.1",
+	"addon_minimumNVDAVersion": "2024.1",
 	# Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
 	"addon_lastTestedNVDAVersion": "2024.1",
 	# Add-on update channel (default is None, denoting stable releases,
