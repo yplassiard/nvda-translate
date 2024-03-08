@@ -66,7 +66,7 @@ class TranslateSettings(SettingsPanel):
 		_translator = ""
 		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-07.1")
 
-def translate(text):
+def translate(text, appcontext):
         """translates the given text to the desired language.
 Stores the result into the cache so that the same translation does not asks deepl servers too often.
         """
@@ -89,7 +89,7 @@ Stores the result into the cache so that the same translation does not asks deep
                 prepared = text
 
                 if hasattr(_translator, "translate_text"):
-                                  translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language)
+                                  translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
                                   translated = translatedRes.text
                 else:
                                   ui.message(_("You must place an API key in settings before translation."))
@@ -98,7 +98,7 @@ Stores the result into the cache so that the same translation does not asks deep
                 return str(e)
         if translated is None or len(translated) == 0:
                 translated = text
-        else:
+        elif translated != text or translatedRes.detected_source_lang == _gpObject.language:
                 _translationCache[appName][text] = translated
         return " " + translated + " "
 
@@ -116,7 +116,7 @@ def speak(speechSequence: SpeechSequence,
         newSpeechSequence = []
         for val in speechSequence:
                 if isinstance(val, str):
-                        v = translate(val)
+                        v = translate(val, _lastTranslatedText)
                         newSpeechSequence.append(v if v is not None else val)
                 else:
                         newSpeechSequence.append(val)
@@ -133,11 +133,9 @@ def getPropertiesSpeech(        # noqa: C901
                 reason = controlTypes.OutputReason.QUERY,
                 **propertyValues
 ):
-        global oldTreeLevel, oldTableID, oldRowNumber, oldRowSpan, oldColumnNumber, oldColumnSpan
+        global oldTreeLevel, oldTableID, oldRowNumber, oldRowSpan, oldColumnNumber, oldColumnSpan, _lastTranslatedText
         textList: List[str] = []
         name: Optional[str] = propertyValues.get('name')
-        if name:
-                textList.append(translate(name))
         if 'role' in propertyValues:
                 role=propertyValues['role']
                 speakRole=True
@@ -147,6 +145,9 @@ def getPropertiesSpeech(        # noqa: C901
         else:
                 speakRole=False
                 role=controlTypes.ROLE_UNKNOWN
+        if name:
+                textList.append(translate(name, _lastTranslatedText + role.name + ":"))
+
         value: Optional[str] = propertyValues.get('value') if role not in controlTypes.silentValuesForRoles else None
         cellCoordsText: Optional[str] = propertyValues.get('cellCoordsText')
         rowNumber = propertyValues.get('rowNumber')
@@ -181,9 +182,9 @@ def getPropertiesSpeech(        # noqa: C901
                                 controlTypes.OutputReason.SAYALL
                         )
         )):
-                textList.append(translate(roleText) if roleText else controlTypes.roleLabels[role])
+                textList.append(translate(roleText, _lastTranslatedText + role.name + ":") if roleText else controlTypes.roleLabels[role])
         if value:
-                textList.append(translate(value))
+                textList.append(translate(value, _lastTranslatedText + role.name + ":"))
         states=propertyValues.get('states',set())
         realStates=propertyValues.get('_states',states)
         negativeStates=propertyValues.get('negativeStates',set())
@@ -193,7 +194,7 @@ def getPropertiesSpeech(        # noqa: C901
         # sometimes description key is present but value is None
         description: Optional[str] = propertyValues.get('description')
         if description:
-                textList.append(translate(description))
+                textList.append(translate(description, _lastTranslatedText + role.name))
         # sometimes keyboardShortcut key is present but value is None
         keyboardShortcut: Optional[str] = propertyValues.get('keyboardShortcut')
         if keyboardShortcut:
@@ -229,7 +230,7 @@ def getPropertiesSpeech(        # noqa: C901
                 if columnNumber and (not sameTable or columnNumber != oldColumnNumber or columnSpan != oldColumnSpan):
                         columnHeaderText: Optional[str] = propertyValues.get("columnHeaderText")
                         if columnHeaderText:
-                                textList.append(translate(columnHeaderText))
+                                textList.append(translate(columnHeaderText, _lastTranslatedText + role.name + ":"))
                         if includeTableCellCoords and not cellCoordsText:
                                 # Translators: Speaks current column number (example output: column 3).
                                 colNumberTranslation: str = _("column %s") % columnNumber
@@ -279,7 +280,7 @@ def getPropertiesSpeech(        # noqa: C901
                         textList.append(ariaCurrentLabel)
         placeholder: Optional[str] = propertyValues.get('placeholder', None)
         if placeholder:
-                textList.append(translate(placeholder))
+                textList.append(translate(placeholder, _lastTranslatedText + role.name + ":"))
         indexInGroup=propertyValues.get('positionInfo_indexInGroup',0)
         similarItemsInGroup=propertyValues.get('positionInfo_similarItemsInGroup',0)
         if 0<indexInGroup<=similarItemsInGroup:
@@ -303,7 +304,6 @@ def getPropertiesSpeech(        # noqa: C901
                         else:
                                 textList.append(levelTranslation)
         types.logBadSequenceTypes(textList)
-        global _lastTranslatedText
         _lastTranslatedText = " ".join(e for e in textList)
         return textList
 
@@ -420,6 +420,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 if _enableTranslation:
                         ui.message(_("Translation enabled."))
                 else:
+                        self.saveLocalCache()
                         ui.message(_("Translation disabled."))
 
         script_toggleTranslate.__doc__ = _("Enables translation to the desired language.")
