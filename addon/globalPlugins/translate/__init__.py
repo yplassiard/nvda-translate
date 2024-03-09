@@ -133,7 +133,7 @@ def speak(speechSequence: SpeechSequence,
 	newSpeechSequence = []
 	for val in speechSequence:
 		if isinstance(val, str):
-			v = translate(val, _lastTranslatedText)
+			v = translate(val, "")
 			newSpeechSequence.append(v if v is not None else val)
 		else:
 			newSpeechSequence.append(val)

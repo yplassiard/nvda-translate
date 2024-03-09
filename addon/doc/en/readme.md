@@ -16,8 +16,7 @@ If you try to enable translation without specifying a valid API key, bad things 
 This add-on installs like any other add-on: Press enter on the "translate-x.y.nvda-addon" file, and answer "Yes" to all asked questions.  Once NVDA restarts, you *must* enter the valid API key that you got in the section above. To do that, head to the NVDA preferences dialogue (nvda+n, preferences, settings). Scroll down the list to find the translate section.  This section only contains one option: a text box to enter your DeepL API Key.
 
 ## Usage
-When installed, the add-on will detect the language your NVDA installation is set to, or will get the Windows active language as a fallback. This language will be used to translate any spoken text, when the feature is activated.
-**Note:** It is currently not possible to set this manually within a Preferences dialog, this may however be implemented in a future release. Also, we don't currently check to make sure DeepL supports translating to your NVDA language. Remember when I said major code cleanup is needed?  
+When first installed, the add-on will detect the language your NVDA installation is set to, or will get the Windows active language as a fallback. This language will be used to translate any spoken text, when the feature is activated. Once you have entered an API key in the NVDA preferences dialogue and pressed OK to ensure it is saved, a "language code" combo box will become available next time you open preferences.  If DeepL does not support your NVDA language as a translation target, you may select a different language code from this combo box.
 
 Then, to enable or disable the translation, press NVDA+Shift+Control+T. This gesture can be modified within NVDA Preferences menu -> Command Gestures dialog.
 
