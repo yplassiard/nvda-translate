@@ -56,11 +56,11 @@ class TranslateSettings(SettingsPanel):
 	def makeSettings(self, settingsSizer):
 		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
 		self._apikey  = sHelper.addLabeledControl(_("Deepl API key:"), wx.TextCtrl)
+		self._langtarget = sHelper.addLabeledControl(_("Target language code:"), wx.Choice)
+		self._langtarget.Append("Auto")
 		if config.conf.get('translate') is not None:
 			self._apikey.SetValue(config.conf['translate'].get('apikey'))
 			# This combobox is used to select the language to translate to. It is filled with the list of languages supported by Deepl.
-			self._langtarget = sHelper.addLabeledControl(_("Target language code:"), wx.Choice)
-			self._langtarget.Append("Auto")
 			for lang in _translator.get_target_languages():
 				self._langtarget.Append(lang.code)
 			if config.conf['translate'].get('targetlang') is not None:
