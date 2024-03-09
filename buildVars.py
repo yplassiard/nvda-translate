@@ -26,7 +26,7 @@ addon_info = {
 	"addon_description": _("""Uses the deepl Translate API to translate each spoken text to the desired language, on the fly.
 This add-on requires an internet connection and a deepl API key."""),
 	# version
-	"addon_version": "2024.03.08",
+	"addon_version": "2024.03.09",
 	# Author(s)
 	"addon_author": u"Samuel Proulx, based largely on work by Yannick PLASSIARD <podcastcecitek@gmail.com>, and Hxebolax",
 	# URL for the add-on documentation support

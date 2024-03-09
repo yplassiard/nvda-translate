@@ -78,7 +78,7 @@ class TranslateSettings(SettingsPanel):
 		config.conf['translate']['targetlang'] = self._langtarget.GetStringSelection()
 		_targetlang = self._langtarget.GetStringSelection()
 		_translator = ""
-		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-08")
+		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-09")
 
 def translate(text, appcontext):
 	"""translates the given text to the desired language.
@@ -163,7 +163,7 @@ def getPropertiesSpeech(        # noqa: C901
 		speakRole=False
 		role=controlTypes.ROLE_UNKNOWN
 	if name:
-		textList.append(translate(name, _lastTranslatedText + role.name + ":"))
+		textList.append(translate(name, _lastTranslatedText + controlTypes.roleLabels[role] + ":"))
 
 	value: Optional[str] = propertyValues.get('value') if role not in controlTypes.silentValuesForRoles else None
 	cellCoordsText: Optional[str] = propertyValues.get('cellCoordsText')
@@ -199,9 +199,9 @@ def getPropertiesSpeech(        # noqa: C901
 				controlTypes.OutputReason.SAYALL
 			)
 	)):
-		textList.append(translate(roleText, _lastTranslatedText + role.name + ":") if roleText else controlTypes.roleLabels[role])
+		textList.append(translate(roleText, _lastTranslatedText + controlTypes.roleLabels[role] + ":") if roleText else controlTypes.roleLabels[role])
 	if value:
-		textList.append(translate(value, _lastTranslatedText + role.name + ":"))
+		textList.append(translate(value, _lastTranslatedText + controlTypes.roleLabels[role] + ":"))
 	states=propertyValues.get('states',set())
 	realStates=propertyValues.get('_states',states)
 	negativeStates=propertyValues.get('negativeStates',set())
@@ -211,7 +211,7 @@ def getPropertiesSpeech(        # noqa: C901
 	# sometimes description key is present but value is None
 	description: Optional[str] = propertyValues.get('description')
 	if description:
-		textList.append(translate(description, _lastTranslatedText + role.name))
+		textList.append(translate(description, _lastTranslatedText + controlTypes.roleLabels[role] + ":"))
 	# sometimes keyboardShortcut key is present but value is None
 	keyboardShortcut: Optional[str] = propertyValues.get('keyboardShortcut')
 	if keyboardShortcut:
@@ -247,7 +247,7 @@ def getPropertiesSpeech(        # noqa: C901
 		if columnNumber and (not sameTable or columnNumber != oldColumnNumber or columnSpan != oldColumnSpan):
 			columnHeaderText: Optional[str] = propertyValues.get("columnHeaderText")
 			if columnHeaderText:
-				textList.append(translate(columnHeaderText, _lastTranslatedText + role.name + ":"))
+				textList.append(translate(columnHeaderText, _lastTranslatedText + controlTypes.roleLabels[role] + ":"))
 			if includeTableCellCoords and not cellCoordsText:
 				# Translators: Speaks current column number (example output: column 3).
 				colNumberTranslation: str = _("column %s") % columnNumber
@@ -297,7 +297,7 @@ def getPropertiesSpeech(        # noqa: C901
 			textList.append(ariaCurrentLabel)
 	placeholder: Optional[str] = propertyValues.get('placeholder', None)
 	if placeholder:
-		textList.append(translate(placeholder, _lastTranslatedText + role.name + ":"))
+		textList.append(translate(placeholder, _lastTranslatedText + controlTypes.roleLabels[role] + ":"))
 	indexInGroup=propertyValues.get('positionInfo_indexInGroup',0)
 	similarItemsInGroup=propertyValues.get('positionInfo_similarItemsInGroup',0)
 	if 0<indexInGroup<=similarItemsInGroup:
@@ -356,7 +356,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				self.language = 'en-us'
 
 		if config.conf['translate'].get('apikey') is not None:
-		  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-08")
+		  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-09")
 		else:
 		  logHandler.log.error("Please give an API key in the configuration.")
 		config.conf.spec['translate'] = {"apikey": "string(default='none')",}
