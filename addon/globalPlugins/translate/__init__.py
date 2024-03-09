@@ -41,8 +41,11 @@ _lastError = 0
 _enableTranslation = False
 _lastTranslatedText = None
 _lastTranslatedTextTime = 0
+_targetlang = ""
+
 if config.conf.get('translate') is not None:
 	_authKey = config.conf['translate'].get('apikey')
+	_targetlang = config.conf['translate'].get('targetlang')
 else:
 	_authKey = ""
 
@@ -52,17 +55,28 @@ class TranslateSettings(SettingsPanel):
 
 	def makeSettings(self, settingsSizer):
 		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
-		self._apikey  = sHelper.addLabeledControl(_("Deepl API key"), wx.TextCtrl)
+		self._apikey  = sHelper.addLabeledControl(_("Deepl API key:"), wx.TextCtrl)
 		if config.conf.get('translate') is not None:
 			self._apikey.SetValue(config.conf['translate'].get('apikey'))
+			# This combobox is used to select the language to translate to. It is filled with the list of languages supported by Deepl.
+			self._langtarget = sHelper.addLabeledControl(_("Target language code:"), wx.Choice)
+			self._langtarget.Append("Auto")
+			for lang in _translator.get_target_languages():
+				self._langtarget.Append(lang.code)
+			if config.conf['translate'].get('targetlang') is not None:
+				self._langtarget.SetStringSelection(config.conf['translate'].get('targetlang'))
+			else:
+				self._langtarget.SetStringSelection("auto")
 		else:
 			self._apikey.SetValue("")
 
 	def onSave(self):
-		global _authKey, _translator
+		global _authKey, _translator, _targetlang
 		_authKey = self._apikey.GetValue()
 		config.conf['translate'] = {}
 		config.conf['translate']['apikey'] = self._apikey.GetValue()
+		config.conf['translate']['targetlang'] = self._langtarget.GetStringSelection()
+		_targetlang = self._langtarget.GetStringSelection()
 		_translator = ""
 		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-08")
 
@@ -70,12 +84,12 @@ def translate(text, appcontext):
 	"""translates the given text to the desired language.
 Stores the result into the cache so that the same translation does not asks deepl servers too often.
 	"""
-	global _translationCache, _enableTranslation, _gpObject, _authKey, _translator
+	global _translationCache, _enableTranslation, _gpObject, _authKey, _translator, _targetlang
 
 	try:
-		appName = globalVars.focusObject.appModule.appName
+		appName = globalVars.focusObject.appModule.appName + "." +_targetlang
 	except:
-		appName = "__global__"
+		appName = "__global__" + "." + _targetlang
 		
 	if _gpObject is None or _enableTranslation is False:
 		return text
@@ -89,8 +103,11 @@ Stores the result into the cache so that the same translation does not asks deep
 		prepared = text
 
 		if hasattr(_translator, "translate_text"):
-				  translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
-				  translated = translatedRes.text
+			if _targetlang == "Auto":
+				translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
+			else:
+				translatedRes = _translator.translate_text(prepared, target_lang=_targetlang, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
+			translated = translatedRes.text
 		else:
 				  ui.message(_("You must place an API key in settings before translation."))
 
