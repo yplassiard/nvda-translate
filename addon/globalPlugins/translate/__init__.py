@@ -63,8 +63,11 @@ class TranslateSettings(SettingsPanel):
 		if config.conf.get('translate') is not None:
 			self._apikey.SetValue(config.conf['translate'].get('apikey'))
 			# This combobox is used to select the language to translate to. It is filled with the list of languages supported by Deepl.
-			for lang in _translator.get_target_languages():
-				self._langtarget.Append(lang.code)
+			try:
+				for lang in _translator.get_target_languages():
+					self._langtarget.Append(lang.code)
+			except Exception as e:
+				self._langtarget.Append(config.conf['translate'].get('targetlang'))
 			if config.conf['translate'].get('targetlang') is not None:
 				self._langtarget.SetStringSelection(config.conf['translate'].get('targetlang'))
 			else:
