@@ -108,22 +108,28 @@ Stores the result into the cache so that the same translation does not asks deep
 		prepared = text
 
 		if hasattr(_translator, "translate_text"):
-			if _targetlang == "Auto" and detect(prepared).upper() != _gpObject.language:
+			try:
+				inlang = detect(prepared).upper()
+			except:
+				inlang = "zz"
+			if inlang == "zz":
+				translated = text	
+			elif _targetlang == "Auto" and inlang != _gpObject.language:
 				translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
 				translated = translatedRes.text
-			elif detect(prepared).upper() != _targetlang:
+			elif inlang != _targetlang:
 				translatedRes = _translator.translate_text(prepared, target_lang=_targetlang, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
 				translated = translatedRes.text
 			else:
-				translated = text	
+				translated = text
 		else:
-				  ui.message(_("You must place an API key in settings before translation."))
+			ui.message(_("You must place an API key in settings before translation."))
 
 	except Exception as e:
 		return str(e)
 	if translated is None or len(translated) == 0:
 		translated = text
-	elif translated != text or translatedRes.detected_source_lang == _gpObject.language:
+	elif translated != text:
 		_translationCache[appName][text] = translated
 	return " " + translated + " "
 
