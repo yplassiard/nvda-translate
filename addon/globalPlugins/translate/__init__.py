@@ -7,6 +7,7 @@
 #This add-on also uses the following external libraries:
 #markupbase, htmlentitydefs, HTMLParser: Come from the Python standard installation.
 #deepl-python: MIT License
+# langdetect and six: for language detection on the local machine
 
 import os, sys, time, codecs, re
 import globalVars
@@ -27,6 +28,7 @@ sys.path.insert(0, os.path.join(curDir, "html"))
 import markupbase
 import deepl
 import addonHandler, languageHandler
+from langdetect import detect
 
 addonHandler.initTranslation()
 #
@@ -78,7 +80,7 @@ class TranslateSettings(SettingsPanel):
 		config.conf['translate']['targetlang'] = self._langtarget.GetStringSelection()
 		_targetlang = self._langtarget.GetStringSelection()
 		_translator = ""
-		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-09")
+		_translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-10")
 
 def translate(text, appcontext):
 	"""translates the given text to the desired language.
@@ -103,11 +105,14 @@ Stores the result into the cache so that the same translation does not asks deep
 		prepared = text
 
 		if hasattr(_translator, "translate_text"):
-			if _targetlang == "Auto":
+			if _targetlang == "Auto" and detect(prepared).upper() != _gpObject.language:
 				translatedRes = _translator.translate_text(prepared, target_lang=_gpObject.language, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
-			else:
+				translated = translatedRes.text
+			elif detect(prepared).upper() != _targetlang:
 				translatedRes = _translator.translate_text(prepared, target_lang=_targetlang, context=appcontext, split_sentences="nonewlines", preserve_formatting=True)
-			translated = translatedRes.text
+				translated = translatedRes.text
+			else:
+				translated = text	
 		else:
 				  ui.message(_("You must place an API key in settings before translation."))
 
@@ -356,7 +361,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				self.language = 'en-us'
 
 		if config.conf['translate'].get('apikey') is not None:
-		  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-09")
+		  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-10")
 		else:
 		  logHandler.log.error("Please give an API key in the configuration.")
 		config.conf.spec['translate'] = {"apikey": "string(default='none')",}
