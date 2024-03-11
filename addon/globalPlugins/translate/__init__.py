@@ -43,7 +43,7 @@ _lastError = 0
 _enableTranslation = False
 _lastTranslatedText = None
 _lastTranslatedTextTime = 0
-_targetlang = ""
+_targetlang = "auto"
 
 if config.conf.get('translate') is not None:
 	_authKey = config.conf['translate'].get('apikey')
@@ -67,7 +67,7 @@ class TranslateSettings(SettingsPanel):
 				for lang in _translator.get_target_languages():
 					self._langtarget.Append(lang.code)
 			except Exception as e:
-				self._langtarget.Append(config.conf['translate'].get('targetlang'))
+				self._langtarget.Append(config.conf['translate'].get('targetlang', 'auto'))
 			if config.conf['translate'].get('targetlang') is not None:
 				self._langtarget.SetStringSelection(config.conf['translate'].get('targetlang', 'auto'))
 			else:
@@ -353,7 +353,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def __init__(self):
 		"""Initializes the global plugin object."""
 		super(globalPluginHandler.GlobalPlugin, self).__init__()
-		global _nvdaGetPropertiesSpeech, _nvdaSpeak, _gpObject, _translator
+		global _nvdaGetPropertiesSpeech, _nvdaSpeak, _gpObject, _translator, _targetlang
 		
 		# if on a secure Desktop, disable the Add-on
 		if globalVars.appArgs.secure: return
@@ -368,7 +368,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				self.language = languageHandler.getWindowsLanguage().replace("_", "-")
 			except:
 				self.language = 'en-us'
-
+		_targetlang = 	_targetlang = config.conf['translate'].get('targetlang', 'auto')
 		if config.conf['translate'].get('apikey') is not None:
 		  _translator = deepl.Translator(_authKey).set_app_info("NVDA-translate", "2024-03-11")
 		else:
